@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-football_academy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-football_academy}
+      POSTGRES_DB: ${POSTGRES_DB:-football_academy}
+    ports:
+      - "5432:5432"
+    volumes:
+      - football_academy_db_data:/var/lib/postgresql/data
+
+volumes:
+  football_academy_db_data:

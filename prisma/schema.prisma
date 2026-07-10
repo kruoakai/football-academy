@@ -1,0 +1,256 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+enum Role {
+  ADMIN
+  COACH
+  GUARDIAN
+  STUDENT
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+}
+
+enum BookingType {
+  ACADEMY
+  CLINIC
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum ActivityType {
+  PRACTICE
+  MATCH
+  CAMP
+  ASSESSMENT
+  CLINIC_GROUP
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+enum AttendanceMethod {
+  QR
+  MANUAL
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?  @unique
+  phone        String?  @unique
+  passwordHash String
+  role         Role
+  leadSource   String?
+  lineUserId   String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  guardian Guardian?
+  coach    Coach?
+  payments Payment[]
+
+  @@map("users")
+}
+
+model Guardian {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  students Student[]
+
+  @@map("guardians")
+}
+
+model Coach {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  specialty String?
+
+  schedules CourseSchedule[]
+
+  @@map("coaches")
+}
+
+model Course {
+  id          String  @id @default(cuid())
+  name        String
+  ageGroup    String
+  level       String?
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+
+  batches     Batch[]
+  schedules   CourseSchedule[]
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Batch {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  sessionTime String
+
+  schedules   CourseSchedule[]
+  enrollments Enrollment[]
+  students    Student[]
+  activities  Activity[]
+
+  @@map("batches")
+}
+
+model CourseSchedule {
+  id       String  @id @default(cuid())
+  courseId String
+  course   Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  batchId  String
+  batch    Batch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  coachId  String
+  coach    Coach   @relation(fields: [coachId], references: [id])
+  day      String
+  time     String
+  venue    String
+
+  bookings Booking[]
+
+  @@map("course_schedules")
+}
+
+model Student {
+  id             String  @id @default(cuid())
+  userId         String? @unique
+  guardianId     String
+  guardian       Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  code           String  @unique
+  name           String
+  dob            DateTime
+  level          String?
+  injuryHistory  String?
+  batchId        String?
+  batch          Batch?  @relation(fields: [batchId], references: [id])
+  createdAt      DateTime @default(now())
+
+  enrollments Enrollment[]
+  bookings    Booking[]
+  attendance  Attendance[]
+
+  @@map("students")
+}
+
+model Enrollment {
+  id        String           @id @default(cuid())
+  studentId String
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course           @relation(fields: [courseId], references: [id])
+  batchId   String
+  batch     Batch            @relation(fields: [batchId], references: [id])
+  status    EnrollmentStatus @default(PENDING)
+  startDate DateTime         @default(now())
+
+  @@map("enrollments")
+}
+
+model ClinicService {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+  durationMin Int
+
+  bookings Booking[]
+
+  @@map("clinic_services")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  type            BookingType
+  studentId       String
+  student         Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  scheduleId      String?
+  schedule        CourseSchedule? @relation(fields: [scheduleId], references: [id])
+  clinicServiceId String?
+  clinicService   ClinicService? @relation(fields: [clinicServiceId], references: [id])
+  date            DateTime
+  status          BookingStatus @default(PENDING_PAYMENT)
+  createdAt       DateTime      @default(now())
+
+  payment Payment?
+
+  @@map("bookings")
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  amount    Decimal       @db.Decimal(10, 2)
+  method    String
+  status    PaymentStatus @default(PENDING)
+  bookingId String        @unique
+  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@map("payments")
+}
+
+model Activity {
+  id       String       @id @default(cuid())
+  name     String
+  type     ActivityType
+  batchId  String?
+  batch    Batch?       @relation(fields: [batchId], references: [id])
+  date     DateTime
+  location String?
+
+  attendance Attendance[]
+
+  @@map("activities")
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  studentId  String
+  student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  activityId String
+  activity   Activity         @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  status     AttendanceStatus
+  checkedBy  String
+  checkedAt  DateTime         @default(now())
+  method     AttendanceMethod
+
+  @@unique([studentId, activityId])
+  @@map("attendance")
+}

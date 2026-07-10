@@ -1,0 +1,42 @@
+import type { Metadata } from "next";
+import { Kanit, Sarabun } from "next/font/google";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import "./globals.css";
+
+const kanit = Kanit({
+  variable: "--font-kanit",
+  subsets: ["latin", "thai"],
+  weight: ["500", "600", "700"],
+});
+
+const sarabun = Sarabun({
+  variable: "--font-sarabun",
+  subsets: ["latin", "thai"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+export const metadata: Metadata = {
+  title: "ยินผัน ฟุตบอล อคาเดมี | สอนโดยทีมชาติ ฟื้นฟูโดยมืออาชีพ",
+  description:
+    "สถาบันฟุตบอลยินผัน อคาเดมี สอนฟุตบอลโดยอดีตนักเตะทีมชาติไทย ผสานการฟื้นฟู/กายภาพบำบัดโดยมืออาชีพ ในที่เดียว",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="th"
+      className={`${kanit.variable} ${sarabun.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-white text-neutral-900">
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}
