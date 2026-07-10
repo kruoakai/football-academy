@@ -30,6 +30,10 @@ export async function registerAction(input: RegistrationInput): Promise<Register
   }
 
   const passwordHash = await bcrypt.hash(guardian.password, 10);
+  const leadSource =
+    guardian.leadSource === "เพื่อนแนะนำ" && guardian.referrerName
+      ? `เพื่อนแนะนำ: ${guardian.referrerName}`
+      : guardian.leadSource;
 
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
@@ -39,6 +43,7 @@ export async function registerAction(input: RegistrationInput): Promise<Register
         email: guardian.email ? guardian.email : null,
         passwordHash,
         role: "GUARDIAN",
+        leadSource,
       },
     });
 

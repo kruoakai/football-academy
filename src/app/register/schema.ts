@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const LEAD_SOURCE_OPTIONS = ["เพื่อนแนะนำ", "Facebook", "Google", "Instagram", "Walk-in", "อื่นๆ"] as const;
+
 export const guardianSchema = z.object({
   name: z.string().min(2, { error: "กรุณากรอกชื่อ-นามสกุล" }),
   phone: z
@@ -10,6 +12,8 @@ export const guardianSchema = z.object({
     .union([z.literal(""), z.email({ error: "อีเมลไม่ถูกต้อง" })])
     .optional(),
   password: z.string().min(8, { error: "รหัสผ่านอย่างน้อย 8 ตัวอักษร" }),
+  leadSource: z.string().min(1, { error: "กรุณาเลือกว่ารู้จักเราจากไหน" }),
+  referrerName: z.string().optional(),
 });
 
 export const studentSchema = z.object({

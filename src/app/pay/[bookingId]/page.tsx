@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatThaiDateTime } from "@/lib/thai";
 import { codeToQrDataUrl } from "@/lib/qrcode";
 import { mockPayAction } from "./actions";
+import PayForm from "./PayForm";
 
 const statusMessage: Record<string, string> = {
   CONFIRMED: "ชำระเงินและยืนยันการจองเรียบร้อยแล้ว",
@@ -34,7 +35,6 @@ export default async function PayPage({
   const amount =
     booking.type === "ACADEMY" ? Number(booking.schedule?.course.price ?? 0) : Number(booking.clinicService?.price ?? 0);
   const label = booking.type === "ACADEMY" ? booking.schedule?.course.name : booking.clinicService?.name;
-  const mockPayAmountForBooking = mockPayAction.bind(null, booking.id);
   const qr = await codeToQrDataUrl(`MOCK-PAY:${booking.id}:${amount}`);
 
   return (
@@ -55,14 +55,7 @@ export default async function PayPage({
         </div>
 
         {booking.status === "PENDING_PAYMENT" ? (
-          <form action={mockPayAmountForBooking} className="mt-6">
-            <button
-              type="submit"
-              className="flex min-h-[44px] w-full items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-base font-semibold text-pitch-950 hover:bg-gold-400"
-            >
-              จำลองชำระเงินสำเร็จ
-            </button>
-          </form>
+          <PayForm action={mockPayAction.bind(null, booking.id)} />
         ) : (
           <p className="mt-6 rounded-lg bg-pitch-50 px-3 py-2 text-center text-sm font-medium text-pitch-800">
             {statusMessage[booking.status] ?? booking.status}

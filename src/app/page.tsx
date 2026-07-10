@@ -1,4 +1,16 @@
 import Link from "next/link";
+import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+
+// Only verified facts go here — Footer's phone number is still a placeholder,
+// so it (and a street address) are deliberately omitted until real values exist.
+// Publishing placeholder contact info as structured data would mislead search engines.
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SportsActivityLocation",
+  name: SITE_NAME,
+  description: SITE_TAGLINE,
+  url: SITE_URL,
+};
 
 const usps = [
   {
@@ -39,6 +51,10 @@ const programs = [
 export default function Home() {
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pitch-900 via-pitch-800 to-pitch-950 text-white">
         <div className="absolute inset-0 opacity-10 [background:repeating-linear-gradient(90deg,white_0px,white_2px,transparent_2px,transparent_80px)]" />

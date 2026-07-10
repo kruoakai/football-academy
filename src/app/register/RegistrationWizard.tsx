@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useFieldArray, useForm, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registrationSchema, type RegistrationInput } from "./schema";
+import { registrationSchema, LEAD_SOURCE_OPTIONS, type RegistrationInput } from "./schema";
 import { registerAction } from "./actions";
 
 export type CourseOption = {
@@ -24,7 +24,7 @@ const STEP_LABELS = ["เลือกคอร์ส", "ข้อมูลผู
 
 const STEP_FIELDS: Record<number, Path<RegistrationInput>[]> = {
   0: ["courseId", "batchId"],
-  1: ["guardian.name", "guardian.phone", "guardian.email", "guardian.password"],
+  1: ["guardian.name", "guardian.phone", "guardian.email", "guardian.password", "guardian.leadSource"],
   2: ["students"],
   3: [],
 };
@@ -52,7 +52,7 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
     defaultValues: {
       courseId: "",
       batchId: "",
-      guardian: { name: "", phone: "", email: "", password: "" },
+      guardian: { name: "", phone: "", email: "", password: "", leadSource: "", referrerName: "" },
       students: [{ name: "", dob: "", level: "" }],
     },
     mode: "onBlur",
@@ -62,6 +62,7 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
 
   const courseId = watch("courseId");
   const batchId = watch("batchId");
+  const leadSource = watch("guardian.leadSource");
   const selectedCourse = courses.find((c) => c.id === courseId);
 
   async function goNext() {
@@ -209,6 +210,30 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
             />
             {errors.guardian?.password && <p className={errorClass}>{errors.guardian.password.message}</p>}
           </div>
+          <div>
+            <label className={labelClass} htmlFor="guardian.leadSource">
+              รู้จักเราจากไหน
+            </label>
+            <select id="guardian.leadSource" className={inputClass} {...register("guardian.leadSource")}>
+              <option value="" disabled>
+                เลือกช่องทาง
+              </option>
+              {LEAD_SOURCE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+            {errors.guardian?.leadSource && <p className={errorClass}>{errors.guardian.leadSource.message}</p>}
+          </div>
+          {leadSource === "เพื่อนแนะนำ" && (
+            <div>
+              <label className={labelClass} htmlFor="guardian.referrerName">
+                ชื่อผู้แนะนำ (ถ้าทราบ)
+              </label>
+              <input id="guardian.referrerName" className={inputClass} {...register("guardian.referrerName")} />
+            </div>
+          )}
         </div>
 
         {/* Step 2: students */}
@@ -273,6 +298,10 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
             <p className="mt-2 font-medium text-pitch-900">ผู้ปกครอง</p>
             <p>{watch("guardian.name")}</p>
             <p>{watch("guardian.phone")}</p>
+            <p>
+              รู้จักเราจาก: {watch("guardian.leadSource")}
+              {watch("guardian.referrerName") ? ` (${watch("guardian.referrerName")})` : ""}
+            </p>
             <p className="mt-2 font-medium text-pitch-900">นักเรียน</p>
             {watch("students").map((s, i) => (
               <p key={i}>

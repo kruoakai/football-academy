@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Kanit, Sarabun } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import "./globals.css";
 
 const kanit = Kanit({
@@ -17,9 +18,15 @@ const sarabun = Sarabun({
 });
 
 export const metadata: Metadata = {
-  title: "ยินผัน ฟุตบอล อคาเดมี | สอนโดยทีมชาติ ฟื้นฟูโดยมืออาชีพ",
+  metadataBase: new URL(SITE_URL),
+  title: `${SITE_NAME} | ${SITE_TAGLINE}`,
   description:
     "สถาบันฟุตบอลยินผัน อคาเดมี สอนฟุตบอลโดยอดีตนักเตะทีมชาติไทย ผสานการฟื้นฟู/กายภาพบำบัดโดยมืออาชีพ ในที่เดียว",
+  openGraph: {
+    siteName: SITE_NAME,
+    locale: "th_TH",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

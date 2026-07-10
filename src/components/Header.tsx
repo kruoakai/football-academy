@@ -9,7 +9,7 @@ const navItems = [
   { label: "คอร์สเรียน", href: null },
   { label: "คลินิกกายภาพ", href: null },
   { label: "แกลเลอรี่", href: null },
-  { label: "บทความ", href: null },
+  { label: "บทความ", href: "/blog" },
   { label: "ติดต่อเรา", href: null },
 ];
 

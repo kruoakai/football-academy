@@ -13,6 +13,9 @@ const navItems = [
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await verifySession();
+  if (session.user.role === "ADMIN") {
+    redirect("/admin");
+  }
   if (session.user.role !== "GUARDIAN") {
     redirect("/coach/attendance");
   }

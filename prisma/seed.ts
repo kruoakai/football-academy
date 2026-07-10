@@ -170,11 +170,31 @@ async function main() {
     });
   }
 
+  const inOneMonth = new Date(now);
+  inOneMonth.setMonth(inOneMonth.getMonth() + 1);
+
+  const existingPromo = await prisma.promotion.findUnique({ where: { code: "TEST10" } });
+  if (!existingPromo) {
+    await prisma.promotion.create({
+      data: {
+        code: "TEST10",
+        type: "DISCOUNT",
+        value: 10,
+        discountUnit: "PERCENT",
+        targetGroup: "ทดสอบระบบ",
+        validFrom: now,
+        validTo: inOneMonth,
+        maxUses: 5,
+      },
+    });
+  }
+
   console.log("Seed complete.");
   console.log("Test accounts (dev only):");
   console.log("  admin:    admin@yinphan.dev / Admin123!");
   console.log("  coach:    coach@yinphan.dev / Coach123!");
   console.log("  guardian: parent@example.com / Parent123! (student code: YP-TEST01)");
+  console.log("  promo code: TEST10 (10% off, max 5 uses)");
   void admin;
 }
 

@@ -32,6 +32,11 @@ export default function Footer() {
                   เกี่ยวกับเรา
                 </Link>
               </li>
+              <li>
+                <Link href="/blog" className="hover:text-gold-300">
+                  บทความ
+                </Link>
+              </li>
               <li className="text-white/40">คอร์สเรียน (เร็วๆ นี้)</li>
               <li className="text-white/40">คลินิกกายภาพ (เร็วๆ นี้)</li>
             </ul>

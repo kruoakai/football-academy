@@ -57,6 +57,22 @@ enum AttendanceMethod {
   MANUAL
 }
 
+enum PromotionType {
+  DISCOUNT
+  GIFT
+}
+
+enum CampaignChannel {
+  EMAIL
+  LINE
+  BOTH
+}
+
+enum DiscountUnit {
+  PERCENT
+  AMOUNT
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -64,6 +80,7 @@ model User {
   phone        String?  @unique
   passwordHash String
   role         Role
+  active       Boolean  @default(true)
   leadSource   String?
   lineUserId   String?  @unique
   createdAt    DateTime @default(now())
@@ -161,9 +178,10 @@ model Student {
   batch          Batch?  @relation(fields: [batchId], references: [id])
   createdAt      DateTime @default(now())
 
-  enrollments Enrollment[]
-  bookings    Booking[]
-  attendance  Attendance[]
+  enrollments   Enrollment[]
+  bookings      Booking[]
+  attendance    Attendance[]
+  injuryRecords InjuryRecord[]
 
   @@map("students")
 }
@@ -189,9 +207,61 @@ model ClinicService {
   price       Decimal @db.Decimal(10, 2)
   durationMin Int
 
-  bookings Booking[]
+  bookings      Booking[]
+  injuryRecords InjuryRecord[]
 
   @@map("clinic_services")
+}
+
+/// PDPA access-control note: this table is intentionally NOT legally reviewed yet
+/// (see CLAUDE.md). Every read/write path MUST be gated to Role.ADMIN only —
+/// do not relax this without a completed PDPA review.
+model InjuryRecord {
+  id              String         @id @default(cuid())
+  studentId       String
+  student         Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  clinicServiceId String?
+  clinicService   ClinicService? @relation(fields: [clinicServiceId], references: [id])
+  diagnosis       String
+  treatmentNotes  String?
+  date            DateTime       @default(now())
+  recordedBy      String
+  createdAt       DateTime       @default(now())
+
+  @@map("injury_records")
+}
+
+model Promotion {
+  id           String        @id @default(cuid())
+  code         String        @unique
+  type         PromotionType
+  value        Decimal?      @db.Decimal(10, 2)
+  discountUnit DiscountUnit?
+  giftItem     String?
+  giftStock    Int?
+  targetGroup  String?
+  validFrom    DateTime
+  validTo      DateTime
+  maxUses      Int?
+  usedCount    Int           @default(0)
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+
+  redemptions PromotionRedemption[]
+
+  @@map("promotions")
+}
+
+model PromotionRedemption {
+  id               String    @id @default(cuid())
+  promotionId      String
+  promotion        Promotion @relation(fields: [promotionId], references: [id])
+  bookingId        String    @unique
+  booking          Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  discountApplied  Decimal?  @db.Decimal(10, 2)
+  createdAt        DateTime  @default(now())
+
+  @@map("promotion_redemptions")
 }
 
 model Booking {
@@ -207,7 +277,8 @@ model Booking {
   status          BookingStatus @default(PENDING_PAYMENT)
   createdAt       DateTime      @default(now())
 
-  payment Payment?
+  payment            Payment?
+  promotionRedemption PromotionRedemption?
 
   @@map("bookings")
 }
@@ -253,4 +324,33 @@ model Attendance {
 
   @@unique([studentId, activityId])
   @@map("attendance")
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  authorName  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("articles")
+}
+
+model Campaign {
+  id             String          @id @default(cuid())
+  subject        String?
+  message        String
+  channel        CampaignChannel
+  audience       String
+  recipientCount Int
+  sentBy         String
+  sentAt         DateTime        @default(now())
+
+  @@map("campaigns")
 }
