@@ -189,6 +189,18 @@ async function main() {
     });
   }
 
+  await prisma.homePageContent.upsert({
+    where: { id: "homepage" },
+    update: {},
+    create: { id: "homepage" },
+  });
+
+  await prisma.siteSettings.upsert({
+    where: { id: "site" },
+    update: {},
+    create: { id: "site" },
+  });
+
   console.log("Seed complete.");
   console.log("Test accounts (dev only):");
   console.log("  admin:    admin@yinphan.dev / Admin123!");

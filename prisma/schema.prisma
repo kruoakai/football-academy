@@ -354,3 +354,102 @@ model Campaign {
 
   @@map("campaigns")
 }
+
+/// Singleton row (id is always "homepage") holding every editable text block
+/// on the public landing page (src/app/page.tsx), so admins can update copy
+/// without a code change. Defaults mirror the original hardcoded copy.
+model HomePageContent {
+  id String @id @default("homepage")
+
+  heroBadge              String @default("ยินผัน ฟุตบอล อคาเดมี")
+  heroTitleLine1         String @default("สอนโดย")
+  heroTitleHighlight1    String @default("ทีมชาติ")
+  heroTitleLine2         String @default("ฟื้นฟูโดย")
+  heroTitleHighlight2    String @default("มืออาชีพ")
+  heroDescription        String @default("สถาบันฟุตบอลที่ดำเนินงานโดยคู่ครองผู้เชี่ยวชาญคนละด้าน ผสานการฝึกซ้อมจากอดีตนักเตะทีมชาติ เข้ากับการดูแลฟื้นฟูร่างกายจากนักกายภาพบำบัดมืออาชีพ ในสถาบันเดียว")
+  heroCtaPrimaryLabel    String @default("สมัครเรียนวันนี้")
+  heroCtaSecondaryLabel  String @default("รู้จักเรามากขึ้น")
+  heroChip1Title         String @default("โค้ช + นักกายภาพ")
+  heroChip1Desc          String @default("ทีมงานมืออาชีพในที่เดียว")
+  heroChip2Title         String @default("ฝึกซ้อม")
+  heroChip2Desc          String @default("ทุกช่วงวัย")
+  heroChip3Title         String @default("ฟื้นฟู")
+  heroChip3Desc          String @default("คลินิกกายภาพ")
+
+  uspSectionTitle    String @default("สองมืออาชีพ หนึ่งเป้าหมาย")
+  uspSectionSubtitle String @default("ความเชี่ยวชาญที่แตกต่างกัน ผสานกันเพื่อพัฒนานักเรียนอย่างรอบด้าน")
+  usp1Tag            String @default("โค้ชหลัก")
+  usp1Title          String @default("สอนโดยอดีตนักเตะทีมชาติ")
+  usp1Name           String @default("ภานุวัฒน์ ยินผัน")
+  usp1Desc           String @default("อดีตนักฟุตบอลทีมชาติไทย ติดทีมดาราเอเชีย (Asian All-Star) หลายสมัย ถ่ายทอดเทคนิคและประสบการณ์ระดับนานาชาติสู่นักเรียนทุกรุ่น")
+  usp2Tag            String @default("หัวหน้าคลินิก")
+  usp2Title          String @default("ฟื้นฟูโดยมืออาชีพ")
+  usp2Name           String @default("ผู้ร่วมก่อตั้ง / นักกายภาพบำบัด")
+  usp2Desc           String @default("อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม ดูแลคลินิกกายภาพและฟื้นฟูของสถาบันโดยตรง ลดความเสี่ยงบาดเจ็บและเสริมสมรรถภาพนักกีฬา")
+
+  highlightsSectionTitle String @default("ทำไมต้องยินผัน ฟุตบอล อคาเดมี")
+  highlight1Title        String @default("หลักสูตรตามช่วงวัย")
+  highlight1Desc         String @default("ออกแบบการฝึกให้เหมาะกับพัฒนาการของนักเรียนแต่ละรุ่น ตั้งแต่ระดับเริ่มต้นถึงระดับแข่งขัน")
+  highlight2Title        String @default("ดูแลครบวงจร")
+  highlight2Desc         String @default("ฝึกซ้อมฟุตบอลควบคู่การประเมินร่างกายและฟื้นฟูอาการบาดเจ็บ โดยทีมงานเฉพาะทาง")
+  highlight3Title        String @default("แจ้งเตือนผ่าน LINE")
+  highlight3Desc         String @default("ตารางฝึกซ้อม การนัดหมาย และผลการเข้าเรียน แจ้งเตือนถึงผู้ปกครองแบบเรียลไทม์")
+
+  programsSectionTitle    String @default("คอร์สเรียนตามช่วงวัย")
+  programsSectionSubtitle String @default("ตัวอย่างการจัดกลุ่มรุ่น — รายละเอียดคอร์สฉบับเต็มเร็วๆ นี้")
+  program1Age             String @default("6–9 ปี")
+  program1Name            String @default("เยาวชนเริ่มต้น")
+  program1Desc            String @default("ปูพื้นฐานทักษะบอลและความสนุกในการเล่น")
+  program2Age             String @default("10–13 ปี")
+  program2Name            String @default("เยาวชนพัฒนา")
+  program2Desc            String @default("พัฒนาเทคนิคเฉพาะตำแหน่งและการอ่านเกม")
+  program3Age             String @default("14–18 ปี")
+  program3Name            String @default("เยาวชนสู่ทีมชาติ")
+  program3Desc            String @default("ยกระดับสู่การแข่งขันและเตรียมความพร้อมสู่ทีมระดับสูง")
+
+  ctaTitle       String @default("พร้อมให้ลูกของคุณก้าวสู่สนามหญ้าแล้วหรือยัง?")
+  ctaDescription String @default("สมัครเรียนวันนี้ พร้อมรับการดูแลจากทีมโค้ชและนักกายภาพบำบัดมืออาชีพ")
+  ctaButtonLabel String @default("เริ่มต้นเลย")
+
+  updatedAt DateTime @updatedAt
+
+  @@map("home_page_content")
+}
+
+/// Singleton row (id is always "site") holding every editable text block in the
+/// site-wide Header/Footer (src/components/Header.tsx, Footer.tsx), so admins
+/// can update the brand name, nav labels, and contact/social info without a
+/// code change. Defaults mirror the original hardcoded copy.
+model SiteSettings {
+  id String @id @default("site")
+
+  headerBrandPrefix    String @default("ยินผัน ")
+  headerBrandHighlight String @default("ฟุตบอล อคาเดมี")
+  headerCtaLabel       String @default("สมัครเรียน")
+  headerLoginLabel     String @default("เข้าสู่ระบบ")
+
+  navHomeLabel    String @default("หน้าแรก")
+  navAboutLabel   String @default("เกี่ยวกับเรา")
+  navCoursesLabel String @default("คอร์สเรียน")
+  navClinicLabel  String @default("คลินิกกายภาพ")
+  navGalleryLabel String @default("แกลเลอรี่")
+  navBlogLabel    String @default("บทความ")
+  navContactLabel String @default("ติดต่อเรา")
+
+  footerBrandName     String @default("ยินผัน ฟุตบอล อคาเดมี")
+  footerDescription   String @default("สอนโดยทีมชาติ ฟื้นฟูโดยมืออาชีพ — สถาบันฟุตบอลที่ผสานการฝึกซ้อมและการดูแลร่างกายไว้ในที่เดียว")
+  footerAddress       String @default("สนามฝึกซ้อม ยินผัน ฟุตบอล อคาเดมี")
+  footerPhone         String @default("0XX-XXX-XXXX")
+  footerLineId        String @default("@yinphanacademy")
+  footerCoursesText   String @default("คอร์สเรียน")
+  footerClinicText    String @default("คลินิกกายภาพ")
+  footerFacebookText  String @default("Facebook (เร็วๆ นี้)")
+  footerInstagramText String @default("Instagram (เร็วๆ นี้)")
+  footerCopyrightText String @default("สงวนลิขสิทธิ์")
+
+  contactHours String @default("จันทร์–อาทิตย์ 09:00–18:00 น.")
+
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}

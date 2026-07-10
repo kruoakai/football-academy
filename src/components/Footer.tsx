@@ -1,6 +1,7 @@
 import Link from "next/link";
+import type { SiteSettings } from "@/lib/site-settings";
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="bg-pitch-950 text-white/80">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -10,11 +11,9 @@ export default function Footer() {
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500 text-pitch-950 text-sm font-bold">
                 YP
               </span>
-              ยินผัน ฟุตบอล อคาเดมี
+              {settings.footerBrandName}
             </div>
-            <p className="mt-3 text-sm leading-relaxed">
-              สอนโดยทีมชาติ ฟื้นฟูโดยมืออาชีพ — สถาบันฟุตบอลที่ผสานการฝึกซ้อมและการดูแลร่างกายไว้ในที่เดียว
-            </p>
+            <p className="mt-3 text-sm leading-relaxed">{settings.footerDescription}</p>
           </div>
 
           <div>
@@ -24,21 +23,39 @@ export default function Footer() {
             <ul className="mt-3 space-y-2 text-sm">
               <li>
                 <Link href="/" className="hover:text-gold-300">
-                  หน้าแรก
+                  {settings.navHomeLabel}
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-gold-300">
-                  เกี่ยวกับเรา
+                  {settings.navAboutLabel}
+                </Link>
+              </li>
+              <li>
+                <Link href="/courses" className="hover:text-gold-300">
+                  {settings.footerCoursesText}
+                </Link>
+              </li>
+              <li>
+                <Link href="/clinic" className="hover:text-gold-300">
+                  {settings.footerClinicText}
+                </Link>
+              </li>
+              <li>
+                <Link href="/gallery" className="hover:text-gold-300">
+                  {settings.navGalleryLabel}
                 </Link>
               </li>
               <li>
                 <Link href="/blog" className="hover:text-gold-300">
-                  บทความ
+                  {settings.navBlogLabel}
                 </Link>
               </li>
-              <li className="text-white/40">คอร์สเรียน (เร็วๆ นี้)</li>
-              <li className="text-white/40">คลินิกกายภาพ (เร็วๆ นี้)</li>
+              <li>
+                <Link href="/contact" className="hover:text-gold-300">
+                  {settings.navContactLabel}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -47,9 +64,9 @@ export default function Footer() {
               ติดต่อเรา
             </h3>
             <ul className="mt-3 space-y-2 text-sm">
-              <li>สนามฝึกซ้อม ยินผัน ฟุตบอล อคาเดมี</li>
-              <li>โทร: 0XX-XXX-XXXX</li>
-              <li>LINE Official: @yinphanacademy</li>
+              <li>{settings.footerAddress}</li>
+              <li>โทร: {settings.footerPhone}</li>
+              <li>LINE Official: {settings.footerLineId}</li>
             </ul>
           </div>
 
@@ -58,14 +75,14 @@ export default function Footer() {
               ติดตามเรา
             </h3>
             <ul className="mt-3 space-y-2 text-sm">
-              <li className="text-white/40">Facebook (เร็วๆ นี้)</li>
-              <li className="text-white/40">Instagram (เร็วๆ นี้)</li>
+              <li className="text-white/40">{settings.footerFacebookText}</li>
+              <li className="text-white/40">{settings.footerInstagramText}</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-white/50">
-          © {new Date().getFullYear()} ยินผัน ฟุตบอล อคาเดมี — สงวนลิขสิทธิ์
+          © {new Date().getFullYear()} {settings.footerBrandName} — {settings.footerCopyrightText}
         </div>
       </div>
     </footer>

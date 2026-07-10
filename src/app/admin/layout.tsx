@@ -4,6 +4,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
 import {
   GridIcon,
+  HomeIcon,
   BookIcon,
   CalendarIcon,
   UsersIcon,
@@ -18,6 +19,8 @@ import {
 
 const navItems = [
   { href: "/admin", label: "ภาพรวม", icon: <GridIcon /> },
+  { href: "/admin/site-content", label: "เนื้อหาหน้าแรก", icon: <HomeIcon /> },
+  { href: "/admin/site-settings", label: "ส่วนหัว/ท้ายเว็บไซต์", icon: <GridIcon /> },
   { href: "/admin/courses", label: "คอร์ส", icon: <BookIcon /> },
   { href: "/admin/batches", label: "รุ่น/ตารางฝึก", icon: <CalendarIcon /> },
   { href: "/admin/coaches", label: "โค้ช", icon: <UsersIcon /> },

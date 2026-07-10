@@ -106,10 +106,10 @@ export default function AboutPage() {
             มาร่วมเป็นส่วนหนึ่งของยินผัน ฟุตบอล อคาเดมี
           </h2>
           <Link
-            href="/"
+            href="/register"
             className="flex min-h-[44px] items-center justify-center rounded-full bg-gold-500 px-8 py-3 text-base font-semibold text-pitch-950 shadow-lg transition hover:bg-gold-400"
           >
-            กลับหน้าแรก
+            สมัครเรียน
           </Link>
         </div>
       </section>

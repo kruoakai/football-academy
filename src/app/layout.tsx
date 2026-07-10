@@ -3,7 +3,14 @@ import { Kanit, Sarabun } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+import { getSiteSettings } from "@/lib/site-settings";
 import "./globals.css";
+
+// Header/Footer text comes from the DB (SiteSettings singleton). Revalidate
+// periodically rather than forcing every route dynamic, so pages that don't
+// need live data (e.g. /about, /login) keep their static-generation speed —
+// admin edits to the header/footer still show up within ~1 minute.
+export const revalidate = 60;
 
 const kanit = Kanit({
   variable: "--font-kanit",
@@ -29,20 +36,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html
       lang="th"
       className={`${kanit.variable} ${sarabun.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-neutral-900">
-        <Header />
+        <Header settings={settings} />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer settings={settings} />
       </body>
     </html>
   );
