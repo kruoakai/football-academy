@@ -43,6 +43,10 @@ next-env.d.ts
 
 # prisma generated client
 /src/generated/
+
+# runtime-uploaded files (admin logo uploads, etc.) — not source code,
+# persists per-deployment via its own filesystem/volume, not git
+/public/images/uploads/
 # node_modules/
 .next/
 # .env
