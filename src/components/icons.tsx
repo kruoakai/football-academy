@@ -1,3 +1,21 @@
+// Brand mark: a minimal soccer-ball glyph used in the Header/Footer logo badge
+// in place of the plain "YP" text (no source logo file exists yet — this is a
+// designed placeholder, swap for a real logo file if/when the client has one).
+export function LogoMark({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 6.7l3.2 2.3-1.2 3.7h-4l-1.2-3.7L12 6.7z" fill="currentColor" />
+      <path
+        d="M12 6.7V3.6M15.2 9l2.8-1.4M14 12.7l1.8 3M10 12.7l-1.8 3M8.8 9L6 7.6"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function HomeIcon() {
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

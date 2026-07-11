@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import FounderPlaceholder from "@/components/FounderPlaceholder";
 
 export const metadata: Metadata = {
@@ -14,12 +15,14 @@ const founders = [
     role: "ผู้ก่อตั้ง / หัวหน้าโค้ช",
     name: "ภานุวัฒน์ ยินผัน",
     bio: "อดีตนักฟุตบอลทีมชาติไทย ติดทีมดาราเอเชีย (Asian All-Star) หลายสมัย ผันตัวมาถ่ายทอดความรู้และประสบการณ์การเล่นในระดับนานาชาติ เพื่อปั้นนักเตะเยาวชนรุ่นใหม่ให้เติบโตอย่างถูกวิธี ทั้งด้านเทคนิค ทัศนคติ และวินัยในสนาม",
+    photo: "/images/panuwat-founder.jpg",
   },
   {
     initials: "PT",
     role: "ผู้ร่วมก่อตั้ง / หัวหน้านักกายภาพบำบัด",
     name: "ผู้ร่วมก่อตั้ง — นักกายภาพบำบัด",
     bio: "อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม สั่งสมประสบการณ์ดูแลนักกีฬาอาชีพ ปัจจุบันดูแลคลินิกกายภาพและฟื้นฟูของสถาบันโดยตรง เพื่อลดความเสี่ยงการบาดเจ็บและช่วยให้นักเรียนกลับมาเล่นได้อย่างปลอดภัย",
+    photo: null,
   },
 ];
 
@@ -59,8 +62,18 @@ export default function AboutPage() {
               key={f.name}
               className="flex flex-col gap-5 rounded-2xl border border-pitch-100 bg-white p-6 shadow-sm sm:flex-row sm:p-8"
             >
-              <div className="w-full sm:w-40 shrink-0">
-                <FounderPlaceholder initials={f.initials} />
+              <div className="relative w-full aspect-square sm:w-40 shrink-0 overflow-hidden rounded-2xl">
+                {f.photo ? (
+                  <Image
+                    src={f.photo}
+                    alt={f.name}
+                    fill
+                    sizes="(min-width: 640px) 160px, 100vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <FounderPlaceholder initials={f.initials} />
+                )}
               </div>
               <div>
                 <span className="inline-block rounded-full bg-pitch-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-pitch-700">

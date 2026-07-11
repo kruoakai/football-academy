@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
@@ -15,18 +16,30 @@ export default async function ClinicPage() {
 
   return (
     <div className="flex flex-col">
-      <section className="bg-gradient-to-br from-pitch-900 via-pitch-800 to-pitch-950 text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20">
-          <span className="inline-block rounded-full bg-gold-500/15 px-4 py-1 text-sm font-medium text-gold-300">
-            คลินิกกายภาพ
-          </span>
-          <h1 className="mx-auto mt-4 max-w-2xl font-heading text-3xl font-bold leading-tight sm:text-4xl">
-            ดูแลฟื้นฟูโดยนักกายภาพบำบัดมืออาชีพ
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-white/80">
-            อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม ดูแลตั้งแต่การประเมินร่างกายก่อนฝึกซ้อม
-            ไปจนถึงการฟื้นฟูอาการบาดเจ็บจากการเล่นกีฬา
-          </p>
+      <section className="relative overflow-hidden bg-gradient-to-br from-pitch-900 via-pitch-800 to-pitch-950 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:text-left">
+          <div className="flex-1 text-center lg:text-left">
+            <span className="inline-block rounded-full bg-gold-500/15 px-4 py-1 text-sm font-medium text-gold-300">
+              คลินิกกายภาพ
+            </span>
+            <h1 className="mx-auto mt-4 max-w-2xl font-heading text-3xl font-bold leading-tight sm:text-4xl lg:mx-0">
+              ดูแลฟื้นฟูโดยนักกายภาพบำบัดมืออาชีพ
+            </h1>
+            <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-white/80 lg:mx-0">
+              อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม ดูแลตั้งแต่การประเมินร่างกายก่อนฝึกซ้อม
+              ไปจนถึงการฟื้นฟูอาการบาดเจ็บจากการเล่นกีฬา
+            </p>
+          </div>
+          <div className="relative aspect-[3/4] w-full max-w-xs shrink-0 overflow-hidden rounded-2xl shadow-lg lg:max-w-sm">
+            <Image
+              src="/images/clinic-training.jpg"
+              alt="การดูแลและยืดกล้ามเนื้อให้นักกีฬาในสนามฝึกซ้อม"
+              fill
+              sizes="(min-width: 1024px) 384px, (min-width: 640px) 320px, 100vw"
+              className="object-cover"
+              priority
+            />
+          </div>
         </div>
       </section>
 

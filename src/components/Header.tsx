@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { SiteSettings } from "@/lib/site-settings";
+import { LogoMark } from "@/components/icons";
 
 // Structural nav config — which items exist is a code decision (new pages
 // need code anyway); only the *label* text is admin-editable via SiteSettings.
@@ -29,8 +30,8 @@ export default function Header({ settings }: { settings: SiteSettings }) {
           className="flex shrink-0 items-center gap-2 whitespace-nowrap font-heading text-base font-semibold tracking-wide sm:text-lg xl:text-xl"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500 text-pitch-950 text-sm font-bold">
-            YP
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500 text-pitch-950">
+            <LogoMark className="h-5 w-5" />
           </span>
           <span>
             {settings.headerBrandPrefix}
