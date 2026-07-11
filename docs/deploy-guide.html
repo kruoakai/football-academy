@@ -1,0 +1,821 @@
+<title>คู่มือติดตั้งระบบบน Ubuntu Server — ยินผัน ฟุตบอล อคาเดมี</title>
+<style>
+:root {
+  --bg: #F3F6F2;
+  --surface: #FFFFFF;
+  --surface-2: #EAF0E7;
+  --surface-2-border: #D7E0D2;
+  --text: #14231A;
+  --text-muted: #52655A;
+  --text-faint: #7C8C81;
+  --border: #D7E0D2;
+  --pitch: #0D5F3A;
+  --pitch-deep: #093C27;
+  --pitch-soft: #E3EEE6;
+  --gold: #92650B;
+  --gold-ink: #7A5509;
+  --gold-soft: #F7EDD4;
+  --gold-soft-border: #E9D9AE;
+  --state-warn: #92650B;
+  --state-warn-soft: #F7EDD4;
+  --state-error: #9A3324;
+  --state-error-soft: #F7E3DE;
+  --code-bg: #14231A;
+  --code-text: #E7EFE3;
+  --code-border: #26382D;
+  --shadow: 0 1px 2px rgba(20,35,26,0.06), 0 8px 24px -12px rgba(20,35,26,0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A100C; --surface: #111B14; --surface-2: #16221A; --surface-2-border: #253327;
+    --text: #E9F0E6; --text-muted: #A3B6A9; --text-faint: #74897C; --border: #233227;
+    --pitch: #3FBB7E; --pitch-deep: #63C993; --pitch-soft: #16261C;
+    --gold: #E8AC2E; --gold-ink: #F0C452; --gold-soft: #2A2211; --gold-soft-border: #4A3B15;
+    --state-warn: #E8AC2E; --state-warn-soft: #2A2211;
+    --state-error: #E58873; --state-error-soft: #2C1712;
+    --code-bg: #0A130D; --code-text: #DCEBD9; --code-border: #1E2E22;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A100C; --surface: #111B14; --surface-2: #16221A; --surface-2-border: #253327;
+  --text: #E9F0E6; --text-muted: #A3B6A9; --text-faint: #74897C; --border: #233227;
+  --pitch: #3FBB7E; --pitch-deep: #63C993; --pitch-soft: #16261C;
+  --gold: #E8AC2E; --gold-ink: #F0C452; --gold-soft: #2A2211; --gold-soft-border: #4A3B15;
+  --state-warn: #E8AC2E; --state-warn-soft: #2A2211;
+  --state-error: #E58873; --state-error-soft: #2C1712;
+  --code-bg: #0A130D; --code-text: #DCEBD9; --code-border: #1E2E22;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+}
+:root[data-theme="light"] {
+  --bg: #F3F6F2; --surface: #FFFFFF; --surface-2: #EAF0E7; --surface-2-border: #D7E0D2;
+  --text: #14231A; --text-muted: #52655A; --text-faint: #7C8C81; --border: #D7E0D2;
+  --pitch: #0D5F3A; --pitch-deep: #093C27; --pitch-soft: #E3EEE6;
+  --gold: #92650B; --gold-ink: #7A5509; --gold-soft: #F7EDD4; --gold-soft-border: #E9D9AE;
+  --state-warn: #92650B; --state-warn-soft: #F7EDD4;
+  --state-error: #9A3324; --state-error-soft: #F7E3DE;
+  --code-bg: #14231A; --code-text: #E7EFE3; --code-border: #26382D;
+  --shadow: 0 1px 2px rgba(20,35,26,0.06), 0 8px 24px -12px rgba(20,35,26,0.18);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+body { font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .eyebrow, .step-num { font-family: 'Kanit', 'Segoe UI', Tahoma, sans-serif; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+a { color: var(--pitch); }
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 20px 96px; }
+.hero { padding: 56px 0 40px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--pitch); background: var(--pitch-soft);
+  border: 1px solid var(--surface-2-border); border-radius: 999px; padding: 6px 14px;
+}
+.hero h1 { font-weight: 700; font-size: clamp(26px, 4vw, 38px); line-height: 1.25; margin-top: 18px; color: var(--text); }
+.hero h1 .accent { color: var(--pitch); }
+.hero p.lede { margin-top: 14px; max-width: 68ch; color: var(--text-muted); font-size: 17px; }
+
+section.block { margin-top: 48px; }
+.block-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.block-head h2 { font-size: 21px; font-weight: 600; }
+.block-head .kicker { font-size: 13px; color: var(--text-faint); }
+.block p.desc { color: var(--text-muted); margin: 0 0 16px; font-size: 15px; }
+
+.steps { display: flex; flex-direction: column; gap: 4px; }
+.step { position: relative; display: grid; grid-template-columns: 40px 1fr; gap: 18px; padding: 20px 0; border-top: 1px solid var(--border); }
+.step:first-child { border-top: none; padding-top: 4px; }
+.step-num {
+  font-weight: 700; font-size: 15px; color: var(--pitch); background: var(--pitch-soft);
+  border: 1px solid var(--surface-2-border); width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-body h3 { font-size: 17px; font-weight: 600; color: var(--text); }
+.step-body p { margin: 6px 0 0; font-size: 15px; color: var(--text-muted); }
+
+.code { position: relative; margin-top: 12px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 12px; overflow-x: auto; }
+.code pre { margin: 0; padding: 14px 52px 14px 16px; font-family: ui-monospace, SFMono-Regular, 'Cascadia Code', Consolas, 'Courier New', monospace; font-size: 13px; line-height: 1.65; color: var(--code-text); white-space: pre; }
+.code .comment { color: #8AA091; }
+.copy-btn {
+  position: absolute; top: 8px; right: 8px; font-family: 'Sarabun', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--code-text); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 7px; padding: 5px 10px; cursor: pointer;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.16); }
+.copy-btn[data-copied="true"] { color: var(--pitch-deep); background: var(--pitch-soft); border-color: var(--pitch-soft); }
+
+.callout { margin-top: 12px; border-radius: 12px; padding: 14px 16px; font-size: 14.5px; border: 1px solid var(--surface-2-border); background: var(--surface-2); color: var(--text); }
+.callout.warn { background: var(--state-warn-soft); border-color: var(--state-warn-soft); }
+.callout.warn strong { color: var(--state-warn); }
+.callout.error { background: var(--state-error-soft); border-color: var(--state-error-soft); }
+.callout.error strong { color: var(--state-error); }
+.callout b, .callout strong { color: var(--pitch); }
+
+.table-wrap { overflow-x: auto; margin-top: 14px; border: 1px solid var(--border); border-radius: 14px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; background: var(--surface); }
+th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+thead th { font-family: 'Kanit', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-faint); background: var(--surface-2); }
+tbody tr:last-child td { border-bottom: none; }
+td code, li code { font-family: ui-monospace, SFMono-Regular, 'Cascadia Code', Consolas, monospace; font-size: 13px; background: var(--surface-2); border: 1px solid var(--surface-2-border); padding: 2px 6px; border-radius: 6px; color: var(--pitch-deep); }
+
+.file-path { display: inline-flex; align-items: center; gap: 6px; font-family: ui-monospace, monospace; font-size: 13px; background: var(--gold-soft); border: 1px solid var(--gold-soft-border); color: var(--gold-ink); padding: 3px 10px; border-radius: 7px; margin: 12px 0 0; }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab-btn {
+  font-family: 'Kanit', sans-serif; font-size: 14.5px; font-weight: 600; color: var(--text-muted);
+  background: transparent; border: none; border-bottom: 3px solid transparent; padding: 12px 4px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab-btn .tab-num { width: 22px; height: 22px; border-radius: 999px; background: var(--surface-2); color: var(--text-faint); font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.tab-btn[aria-selected="true"] { color: var(--pitch); border-bottom-color: var(--pitch); }
+.tab-btn[aria-selected="true"] .tab-num { background: var(--pitch); color: #fff; }
+.tab-btn:hover { color: var(--pitch); }
+.tab-panel { display: none; margin-top: 28px; }
+.tab-panel[data-active="true"] { display: block; }
+.tab-intro { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
+.tab-intro .fit { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--pitch); background: var(--pitch-soft); border-radius: 999px; padding: 4px 12px; margin-bottom: 8px; }
+
+.compare { margin-top: 16px; }
+.compare-cell-good { color: var(--pitch); font-weight: 600; }
+.compare-cell-warn { color: var(--gold-ink); font-weight: 600; }
+
+footer.page-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 13px; }
+
+@media (max-width: 640px) {
+  .step { grid-template-columns: 32px 1fr; gap: 12px; }
+  .step-num { width: 28px; height: 28px; font-size: 13px; border-radius: 8px; }
+}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">คู่มือ Deploy</span>
+    <h1>ติดตั้งระบบขึ้น <span class="accent">Ubuntu Server</span> จริง — 3 วิธี เลือกได้ตามความถนัด</h1>
+    <p class="lede">
+      คู่มือนี้ต่อยอดจาก <code>run-guide.html</code> (รันบนเครื่อง dev) โดยพาไปติดตั้งระบบยินผัน ฟุตบอล อคาเดมี
+      บนเซิร์ฟเวอร์ Ubuntu จริงแบบ production ครบทั้งฐานข้อมูล, HTTPS, และการอัปเดตระบบภายหลัง
+      เลือกได้ 3 วิธี: ใช้ Docker จัดการเอง, ใช้ Docker ร่วมกับ CI/CD อัตโนมัติ, หรือไม่ใช้ Docker เลย
+    </p>
+  </header>
+
+  <!-- ============ PREREQUISITES ============ -->
+  <section class="block" id="prereq">
+    <div class="block-head">
+      <h2>ก่อนเริ่ม — เตรียมเซิร์ฟเวอร์ (ทำครั้งเดียว ใช้ได้ทั้ง 3 วิธี)</h2>
+      <span class="kicker">Prerequisites</span>
+    </div>
+    <p class="desc">ไม่ว่าจะเลือกวิธีไหน ต้องเตรียมเซิร์ฟเวอร์ 5 ขั้นตอนนี้ก่อนเสมอ</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>เช่า/เตรียมเซิร์ฟเวอร์ Ubuntu</h3>
+          <p>แนะนำ Ubuntu 22.04 หรือ 24.04 LTS, RAM อย่างน้อย 2GB (แนะนำ 4GB ขึ้นไปถ้ารัน Docker), พื้นที่ดิสก์อย่างน้อย 20GB</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>สร้างผู้ใช้ที่ไม่ใช่ root</h3>
+          <p>ห้าม deploy ด้วย root โดยตรง — สร้างผู้ใช้ใหม่แล้วให้สิทธิ์ sudo</p>
+          <div class="code">
+            <pre>sudo adduser deploy
+sudo usermod -aG sudo deploy
+<span class="comment"># ล็อกเอาต์แล้วล็อกอินใหม่ด้วยผู้ใช้ deploy ก่อนทำขั้นตอนถัดไป</span></pre>
+            <button class="copy-btn" data-copy="sudo adduser deploy
+sudo usermod -aG sudo deploy">คัดลอก</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>ชี้โดเมนมาที่เซิร์ฟเวอร์</h3>
+          <p>ไปที่ผู้ให้บริการโดเมน สร้าง DNS A record ชี้ <code>yourdomain.com</code> และ <code>www.yourdomain.com</code> ไปที่ IP ของเซิร์ฟเวอร์ รอ DNS propagate (ปกติไม่กี่นาทีถึง 1 ชั่วโมง)</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>ตั้งค่า Firewall (UFW)</h3>
+          <p>เปิดเฉพาะพอร์ตที่จำเป็น — SSH, HTTP, HTTPS</p>
+          <div class="code">
+            <pre>sudo apt update && sudo apt upgrade -y
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable</pre>
+            <button class="copy-btn" data-copy="sudo apt update &amp;&amp; sudo apt upgrade -y
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable">คัดลอก</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>ติดตั้ง Nginx + Certbot</h3>
+          <p>ใช้ Nginx เป็น reverse proxy หน้าแอป และ Certbot ขอใบรับรอง SSL ฟรีจาก Let's Encrypt — ใช้ตัวเดียวกันได้ทั้ง 3 วิธี เพราะสุดท้ายแอปฟังอยู่ที่ <code>127.0.0.1:3000</code> เหมือนกันหมด</p>
+          <div class="code">
+            <pre>sudo apt install -y nginx certbot python3-certbot-nginx</pre>
+            <button class="copy-btn" data-copy="sudo apt install -y nginx certbot python3-certbot-nginx">คัดลอก</button>
+          </div>
+          <div class="callout">
+            ไฟล์ตัวอย่าง Nginx config อยู่ที่ <code>deploy/nginx.conf.example</code> ในโปรเจกต์ — ใช้ตัวเดียวกันได้ในทั้ง 3 วิธี ขั้นตอนตั้งค่าอยู่ในแต่ละแท็บด้านล่าง
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPARISON ============ -->
+  <section class="block" id="compare">
+    <div class="block-head">
+      <h2>เลือกวิธีไหนดี?</h2>
+      <span class="kicker">Compare</span>
+    </div>
+    <div class="table-wrap compare">
+      <table>
+        <thead>
+          <tr><th></th><th>1. Docker (จัดการเอง)</th><th>2. Docker + CI/CD</th><th>3. ไม่ใช้ Docker</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ติดตั้งครั้งแรก</td><td>ปานกลาง</td><td class="compare-cell-warn">ยากสุด (ต้องตั้ง CI เพิ่ม)</td><td class="compare-cell-good">ง่ายสุด</td></tr>
+          <tr><td>อัปเดตระบบครั้งถัดไป</td><td>รันคำสั่งเอง ~5 บรรทัด</td><td class="compare-cell-good">push โค้ด แล้วรออัตโนมัติ</td><td>รันคำสั่งเอง ~5 บรรทัด</td></tr>
+          <tr><td>แยกสภาพแวดล้อมจากเครื่อง</td><td class="compare-cell-good">ดี</td><td class="compare-cell-good">ดี</td><td class="compare-cell-warn">ต่ำกว่า (Node/Postgres ลงตรงเครื่อง)</td></tr>
+          <tr><td>เหมาะกับ</td><td>ทีมที่คุ้นเคย Docker</td><td>ทีมที่ deploy บ่อย/หลายคนดูแลร่วมกัน</td><td>เซิร์ฟเวอร์ทรัพยากรจำกัด อยากง่ายสุด</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ TABS ============ -->
+  <section class="block" id="methods">
+    <div class="block-head">
+      <h2>วิธีติดตั้ง — เลือก 1 ใน 3</h2>
+      <span class="kicker">Deploy methods</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="docker"><span class="tab-num">1</span> Docker (จัดการเอง)</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="cicd"><span class="tab-num">2</span> Docker + CI/CD</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="native"><span class="tab-num">3</span> ไม่ใช้ Docker</button>
+    </div>
+
+    <!-- ---------- TAB 1: DOCKER ---------- -->
+    <div class="tab-panel" data-tab-panel="docker" data-active="true">
+      <p class="tab-intro">
+        <span class="fit">เหมาะกับ: ทีมที่คุ้นเคย Docker อยู่แล้ว อยากแยกสภาพแวดล้อมของแอปออกจากเครื่องจริง</span><br>
+        Build image บนเซิร์ฟเวอร์เอง แล้วรันด้วย Docker Compose — อัปเดตครั้งถัดไปรันคำสั่งเองไม่กี่บรรทัด
+      </p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>ติดตั้ง Docker Engine + Compose plugin</h3>
+            <p>ใช้ repo ทางการของ Docker (ไม่ใช้ <code>snap install docker</code> เพราะจัดการ volume/permission ยุ่งยากกว่า)</p>
+            <div class="code">
+              <pre>sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release &amp;&amp; echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+<span class="comment"># ล็อกเอาต์แล้วล็อกอินใหม่ เพื่อให้สิทธิ์กลุ่ม docker มีผล</span></pre>
+              <button class="copy-btn" data-copy="sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Clone โปรเจกต์ลงเซิร์ฟเวอร์</h3>
+            <div class="code">
+              <pre>git clone https://github.com/YOUR-ORG/football-academy.git /var/www/football-academy
+cd /var/www/football-academy</pre>
+              <button class="copy-btn" data-copy="git clone https://github.com/YOUR-ORG/football-academy.git /var/www/football-academy
+cd /var/www/football-academy">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>สร้างไฟล์ค่าจริง <code>.env.production</code></h3>
+            <div class="code">
+              <pre>cp .env.example .env.production
+nano .env.production</pre>
+              <button class="copy-btn" data-copy="cp .env.example .env.production
+nano .env.production">คัดลอก</button>
+            </div>
+            <div class="callout warn">
+              <strong>สำคัญ:</strong> ใน <code>.env.production</code> ให้ <code>DATABASE_URL</code> ใช้ host ชื่อ <code>db</code> ไม่ใช่ <code>localhost</code>
+              (เพราะรันอยู่ใน docker network เดียวกัน) เช่น
+              <code>postgresql://football_academy:รหัสผ่านจริง@db:5432/football_academy?schema=public</code>
+              และสุ่ม <code>AUTH_SECRET</code> ใหม่เสมอ — ห้ามก็อปค่าจาก dev มาใช้:
+              <code>openssl rand -base64 32</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>Build image และรันฐานข้อมูล + migration</h3>
+            <p>ใช้ <code>docker-compose.prod.yml</code> ที่มากับโปรเจกต์ — มี 3 services: <code>db</code>, <code>app</code>, และ <code>migrate</code> (job รันครั้งเดียวสำหรับ <code>prisma migrate deploy</code>)</p>
+            <div class="code">
+              <pre>docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up -d db
+docker compose -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.prod.yml up -d app</pre>
+              <button class="copy-btn" data-copy="docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up -d db
+docker compose -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.prod.yml up -d app">คัดลอก</button>
+            </div>
+            <div class="callout">
+              ห้ามรัน <code>prisma db seed</code> (มีบัญชีทดสอบรหัสผ่านที่รู้กันทั่วไป) บนฐานข้อมูลจริง — ให้สร้างบัญชีแอดมินคนแรกด้วยสคริปต์แยกหรือ Prisma Studio ผ่าน SSH tunnel แทน
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>ตั้งค่า Nginx reverse proxy + SSL</h3>
+            <div class="code">
+              <pre>sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/football-academy
+sudo nano /etc/nginx/sites-available/football-academy
+<span class="comment"># แก้ yourdomain.com เป็นโดเมนจริงในไฟล์นี้ก่อน save</span>
+sudo ln -s /etc/nginx/sites-available/football-academy /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com</pre>
+              <button class="copy-btn" data-copy="sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/football-academy
+sudo nano /etc/nginx/sites-available/football-academy
+sudo ln -s /etc/nginx/sites-available/football-academy /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <h3>ตรวจสอบว่าใช้งานได้จริง</h3>
+            <div class="code">
+              <pre>docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f app</pre>
+              <button class="copy-btn" data-copy="docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f app">คัดลอก</button>
+            </div>
+            <p>แล้วเปิด <code>https://yourdomain.com</code> ในเบราว์เซอร์ ควรเห็นหน้าแรกของเว็บและมีแม่กุญแจ HTTPS</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <h3>อัปเดตระบบครั้งถัดไป (มีโค้ดใหม่)</h3>
+            <div class="code">
+              <pre>cd /var/www/football-academy
+git pull
+docker compose -f docker-compose.prod.yml build app migrate
+docker compose -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.prod.yml up -d app
+docker image prune -f</pre>
+              <button class="copy-btn" data-copy="cd /var/www/football-academy
+git pull
+docker compose -f docker-compose.prod.yml build app migrate
+docker compose -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.prod.yml up -d app
+docker image prune -f">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- TAB 2: CI/CD ---------- -->
+    <div class="tab-panel" data-tab-panel="cicd" data-active="false">
+      <p class="tab-intro">
+        <span class="fit">เหมาะกับ: ทีมที่ deploy บ่อย หรือมีหลายคนดูแลร่วมกัน</span><br>
+        ต่อยอดจากวิธีที่ 1 — เพิ่ม GitHub Actions ให้ build image และ deploy อัตโนมัติทุกครั้งที่ push โค้ดขึ้น branch <code>main</code>
+      </p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>เตรียมเซิร์ฟเวอร์เหมือนวิธีที่ 1 (ข้อ 1-3)</h3>
+            <p>ติดตั้ง Docker, clone โปรเจกต์ไปที่ <code>/var/www/football-academy</code>, สร้าง <code>.env.production</code> ให้ครบ — แต่ยังไม่ต้อง build เอง เพราะ GitHub Actions จะ build ให้</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>สร้าง SSH key คู่ใหม่สำหรับ CI (แยกจาก key ส่วนตัว)</h3>
+            <div class="code">
+              <pre>ssh-keygen -t ed25519 -C "deploy-bot" -f ~/.ssh/deploy_key -N ""
+cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/deploy_key
+<span class="comment"># คัดลอกเนื้อหา private key ทั้งหมด (รวม BEGIN/END) ไปใส่ GitHub secret ในขั้นตอนถัดไป</span></pre>
+              <button class="copy-btn" data-copy="ssh-keygen -t ed25519 -C &quot;deploy-bot&quot; -f ~/.ssh/deploy_key -N &quot;&quot;
+cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/deploy_key">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>ตั้งค่า GitHub repo secrets</h3>
+            <p>ไปที่ GitHub repo → Settings → Secrets and variables → Actions → New repository secret</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Secret</th><th>ค่า</th></tr></thead>
+                <tbody>
+                  <tr><td><code>SSH_HOST</code></td><td>IP หรือโดเมนของเซิร์ฟเวอร์</td></tr>
+                  <tr><td><code>SSH_USER</code></td><td>ชื่อผู้ใช้ที่สร้างไว้ (เช่น <code>deploy</code>)</td></tr>
+                  <tr><td><code>SSH_PRIVATE_KEY</code></td><td>เนื้อหาไฟล์ <code>~/.ssh/deploy_key</code> ทั้งหมด</td></tr>
+                  <tr><td><code>DEPLOY_PATH</code></td><td><code>/var/www/football-academy</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>เปิด GHCR package เป็น public (ครั้งแรกหลัง push image แรก)</h3>
+            <p>Workflow จะ push image ไปที่ GitHub Container Registry (ghcr.io) — ให้เซิร์ฟเวอร์ดึง image ได้โดยไม่ต้อง login ซับซ้อน ให้เปิด package เป็น public ครั้งเดียว: GitHub → หน้า repo → แท็บ Packages → เลือก package → Package settings → เลื่อนไป Danger Zone → Change visibility → Public</p>
+            <div class="callout">
+              ถ้าไม่อยากเปิด public ก็ทำได้ — สร้าง Personal Access Token สิทธิ์ <code>read:packages</code> แล้วรัน <code>docker login ghcr.io -u USERNAME</code> บนเซิร์ฟเวอร์ครั้งเดียวแทน
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>Push โค้ดขึ้น branch main</h3>
+            <p>ไฟล์ <code>.github/workflows/deploy.yml</code> มากับโปรเจกต์แล้ว — เมื่อ push ขึ้น <code>main</code> จะรันอัตโนมัติ: build image → push ขึ้น ghcr.io → SSH เข้าเซิร์ฟเวอร์ → <code>git pull</code> → pull image ใหม่ → รัน migration → restart แอป</p>
+            <div class="code">
+              <pre>git push origin main</pre>
+              <button class="copy-btn" data-copy="git push origin main">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <h3>ตรวจสอบผลใน GitHub Actions</h3>
+            <p>ไปที่แท็บ Actions ของ repo — ควรเห็น job <code>build-and-push</code> และ <code>deploy</code> ขึ้นสีเขียวทั้งคู่ ถ้า deploy แดง ให้ดู log ใน step "SSH and redeploy" เพื่อหาสาเหตุ</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <h3>Rollback ถ้า deploy ล่าสุดมีปัญหา</h3>
+            <p>ทุก image มี tag เป็น git commit SHA ด้วย — ย้อนกลับไปเวอร์ชันก่อนหน้าได้ทันทีโดยไม่ต้อง revert โค้ด</p>
+            <div class="code">
+              <pre>ssh deploy@yourdomain.com
+cd /var/www/football-academy
+export APP_IMAGE=ghcr.io/YOUR-ORG/football-academy:&lt;sha เก่าที่ต้องการ&gt;
+docker compose -f docker-compose.prod.yml up -d app</pre>
+              <button class="copy-btn" data-copy="ssh deploy@yourdomain.com
+cd /var/www/football-academy
+export APP_IMAGE=ghcr.io/YOUR-ORG/football-academy:SHA_เก่า
+docker compose -f docker-compose.prod.yml up -d app">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- TAB 3: NATIVE ---------- -->
+    <div class="tab-panel" data-tab-panel="native" data-active="false">
+      <p class="tab-intro">
+        <span class="fit">เหมาะกับ: เซิร์ฟเวอร์ทรัพยากรจำกัด หรืออยากตั้งค่าให้เร็ว/ง่ายที่สุด</span><br>
+        ติดตั้ง Node.js และ PostgreSQL ลงเครื่องโดยตรง ไม่ผ่าน Docker เลย ใช้ PM2 คุมโปรเซสให้รันตลอดเวลา
+      </p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>ติดตั้ง Node.js 20 LTS</h3>
+            <div class="code">
+              <pre>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v</pre>
+              <button class="copy-btn" data-copy="curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>ติดตั้ง PostgreSQL และสร้างฐานข้อมูล</h3>
+            <div class="code">
+              <pre>sudo apt install -y postgresql postgresql-contrib
+sudo -u postgres psql -c "CREATE USER football_academy WITH PASSWORD 'รหัสผ่านจริง';"
+sudo -u postgres psql -c "CREATE DATABASE football_academy OWNER football_academy;"</pre>
+              <button class="copy-btn" data-copy="sudo apt install -y postgresql postgresql-contrib
+sudo -u postgres psql -c &quot;CREATE USER football_academy WITH PASSWORD 'รหัสผ่านจริง';&quot;
+sudo -u postgres psql -c &quot;CREATE DATABASE football_academy OWNER football_academy;&quot;">คัดลอก</button>
+            </div>
+            <div class="callout">
+              PostgreSQL ที่ติดตั้งผ่าน apt จะฟังอยู่ที่ <code>localhost</code> เท่านั้นโดย default (ไม่เปิดออก internet) อยู่แล้ว — ไม่ต้องแก้ <code>postgresql.conf</code> เพิ่ม
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>ติดตั้ง PM2 (ตัวคุมโปรเซสให้รันตลอดเวลา)</h3>
+            <div class="code">
+              <pre>sudo npm install -g pm2</pre>
+              <button class="copy-btn" data-copy="sudo npm install -g pm2">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>Clone โปรเจกต์ ตั้งค่า .env แล้ว build</h3>
+            <div class="code">
+              <pre>git clone https://github.com/YOUR-ORG/football-academy.git /var/www/football-academy
+cd /var/www/football-academy
+cp .env.example .env
+nano .env
+<span class="comment"># DATABASE_URL ใช้ host เป็น localhost ได้เลย (Postgres รันบนเครื่องเดียวกัน)
+# AUTH_SECRET ต้องสุ่มใหม่: openssl rand -base64 32</span>
+npm ci
+npx prisma migrate deploy
+npm run build</pre>
+              <button class="copy-btn" data-copy="git clone https://github.com/YOUR-ORG/football-academy.git /var/www/football-academy
+cd /var/www/football-academy
+cp .env.example .env
+nano .env
+npm ci
+npx prisma migrate deploy
+npm run build">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>รันแอปด้วย PM2</h3>
+            <p>ใช้ config ที่มากับโปรเจกต์ <code>deploy/ecosystem.config.js</code></p>
+            <div class="code">
+              <pre>pm2 start deploy/ecosystem.config.js
+pm2 save
+pm2 startup
+<span class="comment"># ทำตามคำสั่ง sudo อีก 1 บรรทัดที่ pm2 พิมพ์ออกมา เพื่อให้แอปเริ่มอัตโนมัติทุกครั้งที่เซิร์ฟเวอร์รีบูต</span></pre>
+              <button class="copy-btn" data-copy="pm2 start deploy/ecosystem.config.js
+pm2 save
+pm2 startup">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <h3>ตั้งค่า Nginx reverse proxy + SSL</h3>
+            <div class="code">
+              <pre>sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/football-academy
+sudo nano /etc/nginx/sites-available/football-academy
+<span class="comment"># แก้ yourdomain.com เป็นโดเมนจริงก่อน save</span>
+sudo ln -s /etc/nginx/sites-available/football-academy /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com</pre>
+              <button class="copy-btn" data-copy="sudo cp deploy/nginx.conf.example /etc/nginx/sites-available/football-academy
+sudo nano /etc/nginx/sites-available/football-academy
+sudo ln -s /etc/nginx/sites-available/football-academy /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com">คัดลอก</button>
+            </div>
+            <p>เปิด <code>https://yourdomain.com</code> ตรวจสอบว่าเว็บขึ้นและมีแม่กุญแจ HTTPS</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <h3>อัปเดตระบบครั้งถัดไป (มีโค้ดใหม่)</h3>
+            <div class="code">
+              <pre>cd /var/www/football-academy
+git pull
+npm ci
+npx prisma migrate deploy
+npm run build
+pm2 restart football-academy</pre>
+              <button class="copy-btn" data-copy="cd /var/www/football-academy
+git pull
+npm ci
+npx prisma migrate deploy
+npm run build
+pm2 restart football-academy">คัดลอก</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ENV VARS ============ -->
+  <section class="block" id="envvars">
+    <div class="block-head">
+      <h2>ตัวแปรสภาพแวดล้อมที่ต้องตั้งค่าจริง</h2>
+      <span class="kicker">Environment variables</span>
+    </div>
+    <p class="desc">อ้างอิงจาก <code>.env.example</code> ในโปรเจกต์ — ค่าที่มีเครื่องหมาย * ต้องเปลี่ยนจากค่า dev เสมอ</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ตัวแปร</th><th>คำอธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>DATABASE_URL</code> *</td><td>connection string ของ Postgres จริง (host เป็น <code>db</code> ถ้าใช้ Docker, <code>localhost</code> ถ้าไม่ใช้)</td></tr>
+          <tr><td><code>AUTH_SECRET</code> *</td><td>สุ่มใหม่ด้วย <code>openssl rand -base64 32</code> ห้ามใช้ค่าจาก dev</td></tr>
+          <tr><td><code>NEXT_PUBLIC_SITE_URL</code> *</td><td>โดเมนจริง เช่น <code>https://yourdomain.com</code> (ใช้ทำ sitemap/SEO/absolute URL)</td></tr>
+          <tr><td><code>LINE_CHANNEL_ACCESS_TOKEN</code></td><td>จาก LINE Official Account Manager — เว้นว่างได้จนกว่าจะเชื่อมต่อจริง</td></tr>
+          <tr><td><code>LINE_CHANNEL_SECRET</code></td><td>คู่กับด้านบน</td></tr>
+          <tr><td><code>NEXT_PUBLIC_LINE_OA_ID</code></td><td>LINE Official Account ID</td></tr>
+          <tr><td><code>RESEND_API_KEY</code></td><td>จาก resend.com หลังยืนยัน sending domain แล้ว — เว้นว่างได้จนกว่าจะเชื่อมต่อจริง</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ SECURITY CHECKLIST ============ -->
+  <section class="block" id="security">
+    <div class="block-head">
+      <h2>เช็คลิสต์ก่อนเปิดใช้งานจริง</h2>
+      <span class="kicker">Security</span>
+    </div>
+    <div class="callout warn">
+      <strong>ข้อมูลบาดเจ็บ/สุขภาพ (injury_records):</strong> ตาม CLAUDE.md ของโปรเจกต์ ตารางนี้ยังไม่ผ่านการตรวจสอบด้านกฎหมาย PDPA
+      ควรปรึกษาผู้เชี่ยวชาญด้าน PDPA/ข้อมูลสุขภาพก่อนเปิดใช้งานกับข้อมูลผู้ใช้จริงบน production
+    </div>
+    <div class="table-wrap" style="margin-top:16px">
+      <table>
+        <tbody>
+          <tr><td>สุ่ม <code>AUTH_SECRET</code> ใหม่บน production</td><td>ห้ามใช้ค่าเดียวกับ dev — ถ้ารั่วเท่ากับปลอมแซง session ผู้ใช้ทุกคนได้</td></tr>
+          <tr><td>บังคับ HTTPS ทุกหน้า</td><td>Certbot ตั้งค่า redirect HTTP → HTTPS ให้อัตโนมัติเมื่อรันเสร็จ</td></tr>
+          <tr><td>ไม่เปิดพอร์ต Postgres ออก internet</td><td>ทั้งวิธี Docker (ไม่ map <code>5432</code> ออก) และไม่ใช้ Docker (Postgres ฟัง localhost อยู่แล้ว) เป็นค่า default ที่ปลอดภัยแล้ว — อย่าไปแก้ให้เปิดออก</td></tr>
+          <tr><td>ห้ามรัน <code>prisma db seed</code> บนฐานข้อมูลจริง</td><td>มีบัญชีทดสอบรหัสผ่านที่รู้กันทั่วไป (<code>Admin123!</code> ฯลฯ) — สร้างบัญชีแอดมินจริงด้วยมือแทน</td></tr>
+          <tr><td>ตั้ง backup ฐานข้อมูลสม่ำเสมอ</td><td>ดูหัวข้อถัดไป — ควรส่งไฟล์ backup ไปเก็บนอกเซิร์ฟเวอร์ด้วย ไม่ใช่เก็บที่เดียวกับฐานข้อมูลจริง</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ BACKUP ============ -->
+  <section class="block" id="backup">
+    <div class="block-head">
+      <h2>สำรอง / กู้คืนฐานข้อมูล</h2>
+      <span class="kicker">Backup &amp; restore</span>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">D</div>
+        <div class="step-body">
+          <h3>วิธี Docker — สำรองข้อมูล</h3>
+          <div class="code">
+            <pre>docker compose -f docker-compose.prod.yml exec db pg_dump -U football_academy football_academy | gzip > backup_$(date +%F).sql.gz</pre>
+            <button class="copy-btn" data-copy="docker compose -f docker-compose.prod.yml exec db pg_dump -U football_academy football_academy | gzip > backup_$(date +%F).sql.gz">คัดลอก</button>
+          </div>
+          <h3 style="margin-top:16px">วิธี Docker — กู้คืนข้อมูล</h3>
+          <div class="code">
+            <pre>gunzip -c backup_2026-07-10.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U football_academy football_academy</pre>
+            <button class="copy-btn" data-copy="gunzip -c backup_2026-07-10.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U football_academy football_academy">คัดลอก</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">N</div>
+        <div class="step-body">
+          <h3>วิธีไม่ใช้ Docker — สำรอง/กู้คืนข้อมูล</h3>
+          <div class="code">
+            <pre>pg_dump -U football_academy football_academy | gzip > backup_$(date +%F).sql.gz
+<span class="comment"># กู้คืน:</span>
+gunzip -c backup_2026-07-10.sql.gz | psql -U football_academy football_academy</pre>
+            <button class="copy-btn" data-copy="pg_dump -U football_academy football_academy | gzip > backup_$(date +%F).sql.gz
+gunzip -c backup_2026-07-10.sql.gz | psql -U football_academy football_academy">คัดลอก</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      แนะนำตั้ง cron job รัน backup ทุกวัน แล้วอัปโหลดไฟล์ไปเก็บที่อื่น (เช่น S3-compatible storage) — เก็บ backup ไว้เครื่องเดียวกับฐานข้อมูลจริงอย่างเดียวไม่ปลอดภัยพอ
+    </div>
+  </section>
+
+  <!-- ============ TROUBLESHOOTING ============ -->
+  <section class="block" id="troubleshoot">
+    <div class="block-head">
+      <h2>แก้ปัญหาที่พบบ่อย</h2>
+      <span class="kicker">Troubleshooting</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+        <tbody>
+          <tr><td>Nginx ขึ้น 502 Bad Gateway</td><td>แอปยังไม่ทำงานที่พอร์ต 3000 — เช็ค <code>docker compose logs app</code> หรือ <code>pm2 logs football-academy</code></td></tr>
+          <tr><td>แก้ schema แล้วเจอ error "does not exist" หลัง deploy</td><td>ต้อง restart แอปหลัง <code>prisma generate</code>/<code>migrate deploy</code> ใหม่เสมอ — โปรเซสเก่าที่รันอยู่จะไม่โหลด client ใหม่ให้เองแม้ไฟล์จะอัปเดตแล้ว (รีสตาร์ท container หรือ <code>pm2 restart</code>)</td></tr>
+          <tr><td>Port 3000 ถูกใช้อยู่แล้ว</td><td><code>sudo lsof -i :3000</code> หาโปรเซสเก่าแล้วปิดก่อนเริ่มใหม่</td></tr>
+          <tr><td>ใบรับรอง SSL ใกล้หมดอายุ</td><td>Certbot ตั้ง systemd timer ต่ออายุอัตโนมัติให้แล้ว เช็คด้วย <code>sudo certbot renew --dry-run</code></td></tr>
+          <tr><td><code>docker compose run migrate</code> error P1001 (reach database)</td><td>ฐานข้อมูลยัง healthy ไม่ครบ — เช็คด้วย <code>docker compose ps</code> ว่า <code>db</code> ขึ้นสถานะ healthy แล้วหรือยัง</td></tr>
+          <tr><td>ดึง image จาก GHCR บนเซิร์ฟเวอร์ไม่ได้ (unauthorized)</td><td>Package ยังเป็น private — ตั้งเป็น public หรือ <code>docker login ghcr.io</code> ด้วย Personal Access Token ก่อน</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ FILES REFERENCE ============ -->
+  <section class="block" id="files">
+    <div class="block-head">
+      <h2>ไฟล์ที่เกี่ยวข้องในโปรเจกต์</h2>
+      <span class="kicker">Reference</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ไฟล์</th><th>ใช้กับ</th></tr></thead>
+        <tbody>
+          <tr><td><code>Dockerfile</code></td><td>วิธีที่ 1, 2 — multi-stage build (deps → builder → runner)</td></tr>
+          <tr><td><code>docker-compose.prod.yml</code></td><td>วิธีที่ 1, 2 — services: db, app, migrate</td></tr>
+          <tr><td><code>.dockerignore</code></td><td>วิธีที่ 1, 2</td></tr>
+          <tr><td><code>.github/workflows/deploy.yml</code></td><td>วิธีที่ 2 — build+push GHCR แล้ว SSH deploy</td></tr>
+          <tr><td><code>deploy/nginx.conf.example</code></td><td>ทั้ง 3 วิธี — reverse proxy template</td></tr>
+          <tr><td><code>deploy/ecosystem.config.js</code></td><td>วิธีที่ 3 — PM2 process config</td></tr>
+          <tr><td><code>.env.example</code></td><td>ทั้ง 3 วิธี — รายการตัวแปรที่ต้องตั้งค่าจริง</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    ยินผัน ฟุตบอล อคาเดมี — คู่มือ deploy production · ใช้คู่กับ <code>run-guide.html</code> (dev) และ <code>verification-guide.html</code> (เช็คลิสต์ฟีเจอร์)
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var text = btn.getAttribute('data-copy');
+    navigator.clipboard.writeText(text).then(function () {
+      var original = btn.textContent;
+      btn.textContent = 'คัดลอกแล้ว';
+      btn.setAttribute('data-copied', 'true');
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.removeAttribute('data-copied');
+      }, 1600);
+    });
+  });
+});
+
+var tabBtns = document.querySelectorAll('.tab-btn');
+var tabPanels = document.querySelectorAll('.tab-panel');
+tabBtns.forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var target = btn.getAttribute('data-tab');
+    tabBtns.forEach(function (b) { b.setAttribute('aria-selected', b === btn ? 'true' : 'false'); });
+    tabPanels.forEach(function (p) {
+      p.setAttribute('data-active', p.getAttribute('data-tab-panel') === target ? 'true' : 'false');
+    });
+  });
+});
+</script>
