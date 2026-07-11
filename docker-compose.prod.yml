@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - football_academy_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No public port mapping — only the `app`/`migrate` services on the
+    # docker network can reach it (DATABASE_URL host is "db", not "localhost").
+
+  app:
+    image: ${APP_IMAGE:-football-academy-app:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    ports:
+      # Bound to localhost only — Nginx (installed on the host) reverse-proxies
+      # to this port. Do not change to "3000:3000" (that would expose the app
+      # directly to the internet, bypassing Nginx/TLS).
+      - "127.0.0.1:3000:3000"
+
+  # One-off job, not a long-running service — run explicitly:
+  #   docker compose run --rm migrate
+  # Built from the `builder` stage (has the full Prisma CLI + devDependencies
+  # that are deliberately excluded from the slim `app` runtime image).
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    command: ["npx", "prisma", "migrate", "deploy"]
+
+volumes:
+  football_academy_db_data:

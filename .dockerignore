@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.*
+!.env.example
+docs
+picture_source
+football-academy-system-brief.md
+*.md
+!README.md
+.claude
+npm-debug.log*
