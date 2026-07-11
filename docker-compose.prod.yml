@@ -33,6 +33,11 @@ services:
       # to this port. Do not change to "3000:3000" (that would expose the app
       # directly to the internet, bypassing Nginx/TLS).
       - "127.0.0.1:3000:3000"
+    volumes:
+      # Admin-uploaded files (e.g. the site logo) are written to this path at
+      # runtime — without a volume they'd be lost on every redeploy, since the
+      # container filesystem is rebuilt from the image each time.
+      - football_academy_uploads:/app/public/images/uploads
 
   # One-off job, not a long-running service — run explicitly:
   #   docker compose run --rm migrate
@@ -53,3 +58,4 @@ services:
 
 volumes:
   football_academy_db_data:
+  football_academy_uploads:
