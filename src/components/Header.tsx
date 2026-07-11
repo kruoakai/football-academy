@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import type { SiteSettings } from "@/lib/site-settings";
 import { LogoMark } from "@/components/icons";
@@ -30,8 +31,12 @@ export default function Header({ settings }: { settings: SiteSettings }) {
           className="flex shrink-0 items-center gap-2 whitespace-nowrap font-heading text-base font-semibold tracking-wide sm:text-lg xl:text-xl"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500 text-pitch-950">
-            <LogoMark className="h-5 w-5" />
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold-500 text-pitch-950">
+            {settings.logoUrl ? (
+              <Image src={settings.logoUrl} alt="" fill unoptimized className="object-cover" />
+            ) : (
+              <LogoMark className="h-5 w-5" />
+            )}
           </span>
           <span>
             {settings.headerBrandPrefix}

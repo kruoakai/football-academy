@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { SiteSettings } from "@/lib/site-settings";
 import { LogoMark } from "@/components/icons";
 
@@ -9,8 +10,12 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2 font-heading text-lg font-semibold text-white">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500 text-pitch-950">
-                <LogoMark className="h-5 w-5" />
+              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold-500 text-pitch-950">
+                {settings.logoUrl ? (
+                  <Image src={settings.logoUrl} alt="" fill unoptimized className="object-cover" />
+                ) : (
+                  <LogoMark className="h-5 w-5" />
+                )}
               </span>
               {settings.footerBrandName}
             </div>

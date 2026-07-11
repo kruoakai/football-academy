@@ -423,6 +423,12 @@ model HomePageContent {
 model SiteSettings {
   id String @id @default("site")
 
+  // Logo image URL shown in Header/Footer in place of the built-in soccer-ball
+  // icon (src/components/icons.tsx LogoMark). Null = use the built-in icon.
+  // No file-upload system exists — admin pastes a hosted image URL, same
+  // pattern as Article.coverImage. Default is the client-provided crest crop.
+  logoUrl String? @default("/images/logo-mark.png")
+
   headerBrandPrefix    String @default("ยินผัน ")
   headerBrandHighlight String @default("ฟุตบอล อคาเดมี")
   headerCtaLabel       String @default("สมัครเรียน")

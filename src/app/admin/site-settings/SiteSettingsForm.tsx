@@ -41,6 +41,15 @@ export default function SiteSettingsForm({ settings }: { settings: SiteSettings 
   return (
     <form action={formAction} className="flex flex-col gap-6">
       <Fieldset title="ส่วนหัว (Header)">
+        <div className="sm:col-span-2">
+          <label className={labelClass} htmlFor="logoUrl">
+            URL รูปโลโก้ (เว้นว่างเพื่อใช้ไอคอนเริ่มต้น)
+          </label>
+          <input id="logoUrl" name="logoUrl" defaultValue={settings.logoUrl ?? ""} className={inputClass} placeholder="https://..." />
+          <p className="mt-1 text-xs text-neutral-500">
+            ต้องเป็น URL ของรูปที่อัปโหลดไว้แล้ว (เช่น ลิงก์จาก Facebook/Google Drive แบบเปิดสาธารณะ) — ระบบยังไม่มีปุ่มอัปโหลดไฟล์โดยตรง
+          </p>
+        </div>
         <Field name="headerBrandPrefix" label="ชื่อแบรนด์ (ส่วนแรก)" value={settings.headerBrandPrefix} />
         <Field
           name="headerBrandHighlight"
