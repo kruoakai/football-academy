@@ -1,8 +1,24 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import PasswordInput from "@/components/PasswordInput";
 import { loginAction } from "./actions";
+
+// useSearchParams() forces this bit into a Suspense boundary (Next.js
+// requirement), so it's split out from the rest of the — otherwise static —
+// login page instead of pulling in the whole page as a CSR bailout.
+function ResetSuccessBanner() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("reset") !== "success") return null;
+
+  return (
+    <div className="mt-4 rounded-lg bg-pitch-50 px-3 py-2 text-sm text-pitch-800">
+      ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว เข้าสู่ระบบด้วยรหัสผ่านใหม่ได้เลย
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(loginAction, undefined);
@@ -14,6 +30,10 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-neutral-600">
           สำหรับผู้ปกครอง โค้ช และเจ้าหน้าที่ยินผัน ฟุตบอล อคาเดมี
         </p>
+
+        <Suspense fallback={null}>
+          <ResetSuccessBanner />
+        </Suspense>
 
         <form action={action} className="mt-6 flex flex-col gap-4">
           <div>
@@ -31,17 +51,12 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
-              รหัสผ่าน
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="mt-1 block min-h-[44px] w-full rounded-lg border border-neutral-300 px-3 py-2 text-base focus:border-pitch-500 focus:outline-none focus:ring-1 focus:ring-pitch-500"
-            />
+            <PasswordInput id="password" name="password" label="รหัสผ่าน" autoComplete="current-password" />
+            <div className="mt-1.5 text-right">
+              <Link href="/forgot-password" className="text-sm font-medium text-pitch-700 hover:text-pitch-900">
+                ลืมรหัสผ่าน?
+              </Link>
+            </div>
           </div>
 
           {state?.error && (

@@ -89,8 +89,23 @@ model User {
   guardian Guardian?
   coach    Coach?
   payments Payment[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
+}
+
+/// Token itself is only ever in the reset-link URL/email — the DB stores a
+/// SHA-256 hash of it, so a DB leak alone can't be used to reset accounts.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("password_reset_tokens")
 }
 
 model Guardian {

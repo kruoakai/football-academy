@@ -16,6 +16,29 @@ export function LogoMark({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
+export function EyeIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" />
+      <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function EyeOffIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10.6 5.1A9.9 9.9 0 0112 5c6 0 9.5 7 9.5 7a17.7 17.7 0 01-3.2 4.1M6.7 6.7C4.2 8.4 2.5 12 2.5 12s3.5 7 9.5 7a9 9 0 004.3-1.1"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.9 10a3 3 0 004.1 4.1" />
+    </svg>
+  );
+}
+
 export function HomeIcon() {
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
