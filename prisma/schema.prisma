@@ -228,6 +228,31 @@ model ClinicService {
   @@map("clinic_services")
 }
 
+enum ClinicActivityCategory {
+  ASSESSMENT
+  TREATMENT
+  FIELD
+}
+
+/// Content-showcase rows for the public /clinic page ("กิจกรรมคลินิกกายภาพและ
+/// การบำบัดภาคสนาม" section) — admin-managed via /admin/clinic-activities.
+/// FIELD-category rows do double duty: they power both the "ดูแลภาคสนาม"
+/// hero section (alternating cards) AND appear as one of the 3 filter tabs
+/// in the "กิจกรรมในคลินิก" grid below it.
+model ClinicActivity {
+  id        String                  @id @default(cuid())
+  category  ClinicActivityCategory
+  title     String
+  caption   String
+  imageUrl  String?
+  sortOrder Int                     @default(0)
+  published Boolean                 @default(true)
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  @@map("clinic_activities")
+}
+
 /// PDPA access-control note: this table is intentionally NOT legally reviewed yet
 /// (see CLAUDE.md). Every read/write path MUST be gated to Role.ADMIN only —
 /// do not relax this without a completed PDPA review.

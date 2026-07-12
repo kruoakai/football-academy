@@ -109,6 +109,92 @@ async function main() {
     }
   }
 
+  // Placeholder content for the /clinic "กิจกรรมคลินิกกายภาพและการบำบัดภาคสนาม"
+  // section — no real photos yet, admin replaces text/images via
+  // /admin/clinic-activities later. imageUrl left null so the public page
+  // renders its built-in placeholder tile instead of a broken image.
+  const clinicActivities: {
+    category: "ASSESSMENT" | "TREATMENT" | "FIELD";
+    title: string;
+    caption: string;
+  }[] = [
+    {
+      category: "FIELD",
+      title: "ตรวจร่างกายก่อนลงสนาม",
+      caption: "ประเมินความพร้อมของร่างกายนักกีฬาก่อนเริ่มฝึกซ้อมหรือแข่งขันทุกครั้ง เพื่อลดความเสี่ยงการบาดเจ็บ",
+    },
+    {
+      category: "FIELD",
+      title: "ปฐมพยาบาลข้างสนามทันที",
+      caption: "ทีมนักกายภาพบำบัดพร้อมดูแลอาการบาดเจ็บเฉียบพลันข้างสนามได้ทันที ไม่ต้องรอเข้าคลินิก",
+    },
+    {
+      category: "FIELD",
+      title: "ยืดเหยียดและวอร์มอัพ",
+      caption: "แนะนำท่ายืดเหยียดและวอร์มอัพที่ถูกต้องก่อน-หลังฝึกซ้อม เพื่อเตรียมกล้ามเนื้อให้พร้อมใช้งาน",
+    },
+    {
+      category: "FIELD",
+      title: "ติดตามอาการระหว่างฝึกซ้อม",
+      caption: "สังเกตและติดตามอาการนักกีฬาระหว่างการฝึกซ้อมอย่างใกล้ชิด เพื่อป้องกันการบาดเจ็บซ้ำ",
+    },
+    {
+      category: "ASSESSMENT",
+      title: "ประเมินความยืดหยุ่นของกล้ามเนื้อ",
+      caption: "ตรวจวัดระยะการเคลื่อนไหวของข้อต่อและความยืดหยุ่นของกล้ามเนื้อ เพื่อวางแผนการฝึกที่เหมาะสม",
+    },
+    {
+      category: "ASSESSMENT",
+      title: "วิเคราะห์ท่าทางการเคลื่อนไหว",
+      caption: "วิเคราะห์ท่าวิ่งและท่าทางการเล่นฟุตบอล เพื่อหาจุดที่อาจนำไปสู่การบาดเจ็บในระยะยาว",
+    },
+    {
+      category: "ASSESSMENT",
+      title: "ประเมินความแข็งแรงของกล้ามเนื้อ",
+      caption: "ทดสอบความแข็งแรงของกล้ามเนื้อมัดหลักที่ใช้ในการเล่นฟุตบอล เพื่อออกแบบโปรแกรมเสริมสร้างที่ตรงจุด",
+    },
+    {
+      category: "ASSESSMENT",
+      title: "ประเมินความพร้อมกลับสู่สนาม",
+      caption: "ตรวจประเมินความพร้อมของนักกีฬาที่เพิ่งฟื้นตัวจากอาการบาดเจ็บ ก่อนอนุญาตให้กลับมาฝึกซ้อมเต็มรูปแบบ",
+    },
+    {
+      category: "TREATMENT",
+      title: "นวดผ่อนคลายกล้ามเนื้อ",
+      caption: "นวดคลายกล้ามเนื้อที่ตึงเครียดจากการฝึกซ้อมหนัก ช่วยให้ฟื้นตัวได้เร็วขึ้น",
+    },
+    {
+      category: "TREATMENT",
+      title: "กายภาพบำบัดด้วยเครื่องมือ",
+      caption: "ใช้เครื่องมือกายภาพบำบัดทางการแพทย์ช่วยลดอาการปวดและอักเสบของกล้ามเนื้อและข้อต่อ",
+    },
+    {
+      category: "TREATMENT",
+      title: "ฟื้นฟูอาการบาดเจ็บข้อเท้า",
+      caption: "โปรแกรมฟื้นฟูเฉพาะทางสำหรับอาการบาดเจ็บข้อเท้า ซึ่งพบบ่อยที่สุดในนักฟุตบอล",
+    },
+    {
+      category: "TREATMENT",
+      title: "โปรแกรมฟื้นฟูหลังผ่าตัด",
+      caption: "ดูแลและออกแบบโปรแกรมฟื้นฟูร่างกายทีละขั้นตอนสำหรับนักกีฬาที่ผ่านการผ่าตัด จนกลับมาเล่นได้เต็มร้อย",
+    },
+  ];
+
+  const nextSortOrderByCategory: Record<string, number> = {};
+  for (const a of clinicActivities) {
+    const sortOrder = nextSortOrderByCategory[a.category] ?? 0;
+    nextSortOrderByCategory[a.category] = sortOrder + 1;
+
+    const existing = await prisma.clinicActivity.findFirst({
+      where: { category: a.category, title: a.title },
+    });
+    if (!existing) {
+      await prisma.clinicActivity.create({
+        data: { category: a.category, title: a.title, caption: a.caption, sortOrder },
+      });
+    }
+  }
+
   // Test guardian + student, already enrolled in the first batch, for quick manual testing
   const firstBatch = batches[0];
   const guardianUser = await prisma.user.upsert({
