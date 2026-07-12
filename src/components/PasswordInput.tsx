@@ -1,21 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type InputHTMLAttributes, type Ref } from "react";
 import { EyeIcon, EyeOffIcon } from "@/components/icons";
 
+// Extra input props (name, autoComplete, required, and — notably — the
+// onChange/onBlur/ref triple from react-hook-form's register()) all just
+// flow through via ...inputProps, so this works both for plain <form
+// action> pages (login, reset-password) and react-hook-form-driven forms
+// (registration wizard).
 export default function PasswordInput({
   id,
-  name,
   label,
-  autoComplete,
-  required = true,
+  ref,
+  ...inputProps
 }: {
   id: string;
-  name: string;
   label: string;
-  autoComplete: string;
-  required?: boolean;
-}) {
+  ref?: Ref<HTMLInputElement>;
+} & InputHTMLAttributes<HTMLInputElement>) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -26,11 +28,10 @@ export default function PasswordInput({
       <div className="relative mt-1">
         <input
           id={id}
-          name={name}
+          ref={ref}
           type={visible ? "text" : "password"}
-          required={required}
-          autoComplete={autoComplete}
           className="block min-h-[44px] w-full rounded-lg border border-neutral-300 px-3 py-2 pr-11 text-base focus:border-pitch-500 focus:outline-none focus:ring-1 focus:ring-pitch-500"
+          {...inputProps}
         />
         <button
           type="button"

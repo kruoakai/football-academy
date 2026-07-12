@@ -14,12 +14,13 @@ export default function ResetPasswordForm({ token }: { token: string }) {
     <form action={action} className="mt-6 flex flex-col gap-4">
       <input type="hidden" name="token" value={token} />
 
-      <PasswordInput id="password" name="password" label="รหัสผ่านใหม่" autoComplete="new-password" />
+      <PasswordInput id="password" name="password" label="รหัสผ่านใหม่" autoComplete="new-password" required />
       <PasswordInput
         id="confirmPassword"
         name="confirmPassword"
         label="ยืนยันรหัสผ่านใหม่"
         autoComplete="new-password"
+        required
       />
 
       {state?.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>}

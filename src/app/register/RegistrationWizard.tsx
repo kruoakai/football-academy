@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFieldArray, useForm, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import PasswordInput from "@/components/PasswordInput";
 import { registrationSchema, LEAD_SOURCE_OPTIONS, type RegistrationInput } from "./schema";
 import { registerAction } from "./actions";
 
@@ -193,19 +194,16 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
           </div>
           <div>
             <label className={labelClass} htmlFor="guardian.email">
-              อีเมล (ไม่บังคับ)
+              อีเมล (ใช้เข้าสู่ระบบและรับลิงก์กู้คืนรหัสผ่าน)
             </label>
             <input id="guardian.email" type="email" className={inputClass} {...register("guardian.email")} />
             {errors.guardian?.email && <p className={errorClass}>{errors.guardian.email.message}</p>}
           </div>
           <div>
-            <label className={labelClass} htmlFor="guardian.password">
-              ตั้งรหัสผ่าน
-            </label>
-            <input
+            <PasswordInput
               id="guardian.password"
-              type="password"
-              className={inputClass}
+              label="ตั้งรหัสผ่าน"
+              autoComplete="new-password"
               {...register("guardian.password")}
             />
             {errors.guardian?.password && <p className={errorClass}>{errors.guardian.password.message}</p>}

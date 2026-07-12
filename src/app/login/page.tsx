@@ -51,7 +51,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <PasswordInput id="password" name="password" label="รหัสผ่าน" autoComplete="current-password" />
+            <PasswordInput id="password" name="password" label="รหัสผ่าน" autoComplete="current-password" required />
             <div className="mt-1.5 text-right">
               <Link href="/forgot-password" className="text-sm font-medium text-pitch-700 hover:text-pitch-900">
                 ลืมรหัสผ่าน?
