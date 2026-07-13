@@ -15,6 +15,7 @@ type DefaultValues = {
   validFrom: string;
   validTo: string;
   maxUses: number | null;
+  showOnRegisterPage: boolean;
 };
 
 export default function PromotionForm({
@@ -175,6 +176,18 @@ export default function PromotionForm({
           className={inputClass}
         />
       </div>
+
+      <label className="flex min-h-[44px] items-center gap-3 rounded-xl border border-neutral-200 px-4">
+        <input
+          type="checkbox"
+          name="showOnRegisterPage"
+          defaultChecked={defaultValues?.showOnRegisterPage ?? false}
+          className="h-5 w-5 rounded border-neutral-300 text-pitch-700 focus:ring-pitch-500"
+        />
+        <span className="text-sm text-neutral-700">
+          แสดงในหน้าสมัครเรียน (/register) — โค้ดยังใช้ได้ตอนชำระเงินแม้ไม่ติ๊กช่องนี้
+        </span>
+      </label>
 
       {state?.error && <p className={errorClass}>{state.error}</p>}
 

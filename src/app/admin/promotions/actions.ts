@@ -19,6 +19,7 @@ const promotionSchema = z
     validFrom: z.string().min(1, { error: "กรุณาเลือกวันเริ่ม" }),
     validTo: z.string().min(1, { error: "กรุณาเลือกวันสิ้นสุด" }),
     maxUses: z.string().optional(),
+    showOnRegisterPage: z.string().optional(),
   })
   .check((ctx) => {
     const v = ctx.value;
@@ -58,6 +59,7 @@ function buildData(parsed: z.infer<typeof promotionSchema>) {
     validFrom: new Date(parsed.validFrom),
     validTo: new Date(`${parsed.validTo}T23:59:59`),
     maxUses: parsed.maxUses ? Number(parsed.maxUses) : null,
+    showOnRegisterPage: parsed.showOnRegisterPage === "on",
   };
 }
 

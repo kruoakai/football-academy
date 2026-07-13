@@ -32,6 +32,7 @@ export default async function AdminPromotionsPage() {
               <th className={thClass}>มูลค่า</th>
               <th className={thClass}>ใช้ได้ถึง</th>
               <th className={thClass}>ใช้ไปแล้ว</th>
+              <th className={thClass}>แสดงหน้าสมัครเรียน</th>
               <th className={thClass}>สถานะ</th>
               <th className={thClass}></th>
             </tr>
@@ -55,6 +56,7 @@ export default async function AdminPromotionsPage() {
                   {p.usedCount}
                   {p.maxUses ? ` / ${p.maxUses}` : ""}
                 </td>
+                <td className={tdClass}>{p.showOnRegisterPage ? "แสดง" : "ไม่แสดง"}</td>
                 <td className={tdClass}>
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -85,7 +87,7 @@ export default async function AdminPromotionsPage() {
             ))}
             {promotions.length === 0 && (
               <tr>
-                <td className={tdClass} colSpan={7}>
+                <td className={tdClass} colSpan={8}>
                   <span className="text-neutral-400">ยังไม่มีโปรโมชั่น</span>
                 </td>
               </tr>

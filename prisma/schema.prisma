@@ -286,6 +286,10 @@ model Promotion {
   maxUses      Int?
   usedCount    Int           @default(0)
   active       Boolean       @default(true)
+  // Whether this promotion is showcased on the public /register page — separate
+  // from `active` so admin can hold codes back (e.g. staff/referral-only codes)
+  // that still work at checkout but aren't advertised.
+  showOnRegisterPage Boolean @default(false)
   createdAt    DateTime      @default(now())
 
   redemptions PromotionRedemption[]

@@ -4,9 +4,10 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { cardClass } from "@/lib/admin-ui";
 import { formatThaiDate, formatThaiDateTime } from "@/lib/thai";
-import { updateStudentAction, addInjuryRecordAction } from "../actions";
+import { updateStudentAction, addInjuryRecordAction, updateGuardianAccountAction } from "../actions";
 import StudentEditForm from "../StudentEditForm";
 import InjuryRecordForm from "../InjuryRecordForm";
+import GuardianAccountForm from "../GuardianAccountForm";
 
 export const metadata: Metadata = { title: "รายละเอียดนักเรียน | หลังบ้านแอดมิน" };
 export const dynamic = "force-dynamic";
@@ -82,6 +83,18 @@ export default async function AdminStudentDetailPage({ params }: { params: Promi
             dob: student.dob.toISOString().slice(0, 10),
             level: student.level,
             batchId: student.batchId,
+          }}
+        />
+      </div>
+
+      <div className={cardClass}>
+        <h2 className="mb-4 font-heading text-lg font-semibold text-pitch-900">บัญชีผู้ปกครอง</h2>
+        <GuardianAccountForm
+          action={updateGuardianAccountAction.bind(null, student.id, student.guardian.user.id)}
+          defaultValues={{
+            name: student.guardian.user.name,
+            phone: student.guardian.user.phone,
+            email: student.guardian.user.email,
           }}
         />
       </div>

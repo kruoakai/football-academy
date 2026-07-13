@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function getActivePromotions() {
   const now = new Date();
   const promotions = await prisma.promotion.findMany({
-    where: { active: true, validFrom: { lte: now }, validTo: { gte: now } },
+    where: { active: true, showOnRegisterPage: true, validFrom: { lte: now }, validTo: { gte: now } },
     orderBy: { validTo: "asc" },
   });
 

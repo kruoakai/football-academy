@@ -35,6 +35,7 @@ export default async function EditPromotionPage({ params }: { params: Promise<{ 
             validFrom: promotion.validFrom.toISOString().slice(0, 10),
             validTo: promotion.validTo.toISOString().slice(0, 10),
             maxUses: promotion.maxUses,
+            showOnRegisterPage: promotion.showOnRegisterPage,
           }}
           submitLabel="บันทึกการแก้ไข"
         />
