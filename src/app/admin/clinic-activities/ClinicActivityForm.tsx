@@ -27,6 +27,7 @@ export default function ClinicActivityForm({
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const [preview, setPreview] = useState<string | null>(defaultValues?.imageUrl ?? null);
+  const hasImage = !!preview;
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -104,15 +105,25 @@ export default function ClinicActivityForm({
         </div>
       </div>
 
-      <label className="flex min-h-[44px] items-center gap-2 text-sm font-medium text-neutral-700">
-        <input
-          type="checkbox"
-          name="published"
-          defaultChecked={defaultValues?.published ?? true}
-          className="h-5 w-5 rounded border-neutral-300"
-        />
-        แสดงผลบนหน้าเว็บไซต์
-      </label>
+      <div>
+        <label
+          className={`flex min-h-[44px] items-center gap-2 text-sm font-medium ${
+            hasImage ? "text-neutral-700" : "cursor-not-allowed text-neutral-400"
+          }`}
+        >
+          <input
+            type="checkbox"
+            name="published"
+            defaultChecked={(defaultValues?.published ?? true) && hasImage}
+            disabled={!hasImage}
+            className="h-5 w-5 rounded border-neutral-300 disabled:cursor-not-allowed"
+          />
+          แสดงผลบนหน้าเว็บไซต์
+        </label>
+        {!hasImage && (
+          <p className="mt-1 text-xs text-gold-700">กรุณาอัปโหลดรูปภาพก่อน จึงจะแสดงผลบนหน้าเว็บไซต์ได้</p>
+        )}
+      </div>
 
       {state?.error && !state.error.includes("หมวดหมู่") && <p className={errorClass}>{state.error}</p>}
 

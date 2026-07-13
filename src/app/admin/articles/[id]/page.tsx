@@ -30,7 +30,6 @@ export default async function EditArticlePage({ params }: { params: Promise<{ id
             excerpt: article.excerpt,
             content: article.content,
             coverImage: article.coverImage,
-            authorName: article.authorName,
             published: article.published,
           }}
           submitLabel="บันทึกการแก้ไข"

@@ -1,6 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
+import { prisma } from "@/lib/prisma";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import { getHomeContent } from "@/lib/home-content";
+import { formatThaiDate } from "@/lib/thai";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +20,11 @@ const organizationJsonLd = {
 
 export default async function Home() {
   const c = await getHomeContent();
+  const latestArticles = await prisma.article.findMany({
+    where: { published: true },
+    orderBy: { publishedAt: "desc" },
+    take: 3,
+  });
 
   const usps = [
     { tag: c.usp1Tag, title: c.usp1Title, name: c.usp1Name, desc: c.usp1Desc },
@@ -133,6 +141,49 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest articles */}
+      {latestArticles.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="text-center">
+            <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">บทความล่าสุด</h2>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {latestArticles.map((a) => (
+              <Link
+                key={a.id}
+                href={`/articles/${a.slug}`}
+                className="flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:border-pitch-300 hover:shadow-md"
+              >
+                {a.coverImage ? (
+                  <div className="relative aspect-[16/9] w-full">
+                    <Image src={a.coverImage} alt={a.title} fill unoptimized className="object-cover" />
+                  </div>
+                ) : (
+                  <div className="flex aspect-[16/9] w-full items-center justify-center bg-gradient-to-br from-pitch-700 to-pitch-950">
+                    <span className="font-heading text-3xl font-bold text-gold-400">YP</span>
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col gap-2 p-5">
+                  <p className="text-xs text-neutral-400">
+                    {a.publishedAt ? formatThaiDate(a.publishedAt) : formatThaiDate(a.createdAt)}
+                  </p>
+                  <h3 className="font-heading text-lg font-semibold text-pitch-900">{a.title}</h3>
+                  {a.excerpt && <p className="line-clamp-2 text-sm text-neutral-600">{a.excerpt}</p>}
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/articles"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-pitch-300 px-6 py-3 text-base font-semibold text-pitch-700 transition hover:bg-pitch-50"
+            >
+              อ่านบทความทั้งหมด
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Programs teaser */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">

@@ -14,7 +14,7 @@ const navConfig = [
   { key: "navCoursesLabel", href: "/courses" },
   { key: "navClinicLabel", href: "/clinic" },
   { key: "navGalleryLabel", href: "/gallery" },
-  { key: "navBlogLabel", href: "/blog" },
+  { key: "navBlogLabel", href: "/articles" },
   { key: "navContactLabel", href: "/contact" },
 ] as const;
 

@@ -9,7 +9,7 @@ import { renderMarkdown } from "@/lib/markdown";
 export const dynamic = "force-dynamic";
 
 async function getArticle(slug: string) {
-  return prisma.article.findFirst({ where: { slug, published: true } });
+  return prisma.article.findFirst({ where: { slug, published: true }, include: { author: true } });
 }
 
 export async function generateMetadata({
@@ -46,20 +46,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     headline: article.title,
     datePublished: article.publishedAt?.toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author: article.authorName ? { "@type": "Person", name: article.authorName } : undefined,
+    author: article.author?.name ? { "@type": "Person", name: article.author.name } : undefined,
   };
 
   return (
     <article className="mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <Link href="/blog" className="text-sm font-medium text-pitch-700 hover:text-pitch-900">
+      <Link href="/articles" className="text-sm font-medium text-pitch-700 hover:text-pitch-900">
         ← กลับไปหน้าบทความ
       </Link>
 
       <p className="mt-4 text-sm text-neutral-400">
         {article.publishedAt ? formatThaiDate(article.publishedAt) : formatThaiDate(article.createdAt)}
-        {article.authorName ? ` · โดย ${article.authorName}` : ""}
+        {article.author?.name ? ` · โดย ${article.author.name}` : ""}
       </p>
       <h1 className="mt-2 font-heading text-2xl font-bold leading-tight text-pitch-900 sm:text-3xl">
         {article.title}

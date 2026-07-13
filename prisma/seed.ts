@@ -1,4 +1,8 @@
 import bcrypt from "bcryptjs";
+import sharp from "sharp";
+import { existsSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -7,6 +11,37 @@ const prisma = new PrismaClient({ adapter });
 
 async function hash(password: string) {
   return bcrypt.hash(password, 10);
+}
+
+// public/images/uploads/ is gitignored (runtime-generated, not committed source —
+// same as every other admin-uploaded image in this app), so placeholder article
+// cover images must be generated here at seed-time rather than checked into git,
+// or a fresh clone/deploy would seed rows pointing at files that don't exist.
+async function ensureSeedCoverImage(
+  filename: string,
+  gradient: { from: string; to: string; accent: string }
+): Promise<string> {
+  const dir = path.join(process.cwd(), "public", "images", "uploads", "articles");
+  await mkdir(dir, { recursive: true });
+  const filePath = path.join(dir, filename);
+  if (!existsSync(filePath)) {
+    const svg = `
+      <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${gradient.from}" />
+            <stop offset="100%" stop-color="${gradient.to}" />
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="630" fill="url(#g)" />
+        <circle cx="1020" cy="140" r="220" fill="${gradient.accent}" opacity="0.12" />
+        <circle cx="120" cy="560" r="160" fill="${gradient.accent}" opacity="0.10" />
+        <rect x="0" y="0" width="14" height="630" fill="${gradient.accent}" />
+      </svg>
+    `;
+    await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toFile(filePath);
+  }
+  return `/images/uploads/articles/${filename}`;
 }
 
 async function main() {
@@ -271,6 +306,127 @@ async function main() {
         validFrom: now,
         validTo: inOneMonth,
         maxUses: 5,
+      },
+    });
+  }
+
+  const articleSeeds = [
+    {
+      slug: "pre-match-nutrition",
+      title: "5 อาหารที่นักฟุตบอลเยาวชนควรกินก่อนแข่ง",
+      excerpt: "เลือกอาหารให้ถูกก่อนลงสนาม ช่วยให้ลูกมีพลังงานเต็มที่ตลอดเกม",
+      cover: "seed-pre-match-nutrition.jpg",
+      gradient: { from: "#0d5f3a", to: "#093c27", accent: "#d4a017" },
+      content: `## กินอย่างไรให้พร้อมก่อนลงสนาม
+
+การเตรียมร่างกายด้วยอาหารที่เหมาะสมก่อนแข่งขันมีผลต่อพลังงานและสมาธิของนักเรียนตลอดเกม ต่อไปนี้คือ 5 กลุ่มอาหารที่แนะนำ
+
+1. **คาร์โบไฮเดรตเชิงซ้อน** เช่น ข้าวกล้อง ขนมปังโฮลวีต ให้พลังงานที่ค่อยๆ ปลดปล่อยตลอดการแข่งขัน
+2. **โปรตีนย่อยง่าย** เช่น ไข่ต้ม อกไก่ย่าง ช่วยซ่อมแซมกล้ามเนื้อ
+3. **ผลไม้สด** เช่น กล้วย ส้ม ให้วิตามินและน้ำตาลธรรมชาติ
+4. **น้ำเปล่า** ดื่มให้เพียงพอตั้งแต่ 2-3 ชั่วโมงก่อนแข่ง หลีกเลี่ยงน้ำอัดลม
+5. **หลีกเลี่ยงอาหารมันและย่อยยาก** อย่างของทอดหรืออาหารรสจัด เพราะอาจทำให้อึดอัดขณะเล่น
+
+ควรกินมื้อหลักก่อนแข่ง 2-3 ชั่วโมง และเว้นช่วงว่างให้ร่างกายย่อยอาหารก่อนลงสนาม`,
+    },
+    {
+      slug: "choosing-football-boots",
+      title: "วิธีเลือกรองเท้าฟุตบอลให้เหมาะกับเด็ก",
+      excerpt: "รองเท้าที่ใช่ช่วยลดการบาดเจ็บและเพิ่มความมั่นใจให้นักเตะตัวน้อย",
+      cover: "seed-choosing-football-boots.jpg",
+      gradient: { from: "#14532d", to: "#052e16", accent: "#e8ac2e" },
+      content: `## เลือกรองเท้าให้เหมาะกับพื้นสนามและวัย
+
+รองเท้าฟุตบอลที่เหมาะสมช่วยลดความเสี่ยงบาดเจ็บและทำให้เล่นได้เต็มประสิทธิภาพ
+
+- **สนามหญ้าจริง** ใช้ปุ่มยาง (FG) ยึดเกาะดี
+- **สนามหญ้าเทียม** ใช้ปุ่มเล็กแบบ (AG/TF) ป้องกันข้อเท้าพลิก
+- **ขนาดพอดี** เหลือช่องว่างปลายเท้าประมาณ 0.5-1 ซม. ไม่คับหรือหลวมเกินไป
+- **เนื้อวัสดุ** สำหรับเด็กเล็กแนะนำวัสดุสังเคราะห์ที่ยืดหยุ่นและระบายอากาศได้ดี
+
+ควรพาลูกไปลองรองเท้าด้วยตัวเองทุกครั้ง เพราะขนาดเท้าของเด็กเปลี่ยนแปลงเร็ว และควรเปลี่ยนรองเท้าใหม่เมื่อเริ่มคับหรือปุ่มสึก`,
+    },
+    {
+      slug: "injury-prevention-basics",
+      title: "ป้องกันการบาดเจ็บที่พบบ่อยในนักฟุตบอลเยาวชน",
+      excerpt: "อาการบาดเจ็บส่วนใหญ่ป้องกันได้ ด้วยการวอร์มอัพและเทคนิคที่ถูกต้อง",
+      cover: "seed-injury-prevention-basics.jpg",
+      gradient: { from: "#166534", to: "#0d3320", accent: "#f0c040" },
+      content: `## รู้ทันการบาดเจ็บ ป้องกันได้ก่อนเกิด
+
+การบาดเจ็บที่พบบ่อยในนักฟุตบอลเยาวชน ได้แก่ ข้อเท้าพลิก กล้ามเนื้อต้นขาอักเสบ และหัวเข่าบาดเจ็บ ซึ่งส่วนใหญ่ป้องกันได้
+
+### สาเหตุหลัก
+- วอร์มอัพไม่เพียงพอก่อนฝึกซ้อมหรือแข่งขัน
+- กล้ามเนื้อตึงหรืออ่อนแรงจากการฝึกหนักเกินไป
+- เทคนิคการรับ-ส่งบอลหรือการล้มที่ไม่ถูกต้อง
+
+### วิธีป้องกัน
+1. วอร์มอัพและยืดกล้ามเนื้อทุกครั้งก่อนเล่น อย่างน้อย 10-15 นาที
+2. ฝึกความแข็งแรงของกล้ามเนื้อรอบข้อเท้าและเข่าอย่างสม่ำเสมอ
+3. พักผ่อนให้เพียงพอ ไม่ฝึกหนักติดต่อกันหลายวัน
+4. หากมีอาการเจ็บผิดปกติ ควรปรึกษาทีมกายภาพบำบัดทันที ไม่ควรฝืนเล่นต่อ
+
+ทีมนักกายภาพบำบัดของสถาบันพร้อมให้คำแนะนำและตรวจประเมินอาการเบื้องต้นให้นักเรียนทุกคน`,
+    },
+    {
+      slug: "football-builds-confidence",
+      title: "สร้างวินัยและความมั่นใจให้ลูกผ่านฟุตบอล",
+      excerpt: "ฟุตบอลไม่ได้สอนแค่ทักษะการเล่น แต่ยังปลูกฝังวินัยและความมั่นใจในตัวเอง",
+      cover: "seed-football-builds-confidence.jpg",
+      gradient: { from: "#0f5132", to: "#062818", accent: "#d4a017" },
+      content: `## มากกว่าทักษะลูกหนัง คือบทเรียนชีวิต
+
+การฝึกฟุตบอลอย่างต่อเนื่องช่วยปลูกฝังคุณสมบัติสำคัญให้เด็กนอกเหนือจากทักษะการเล่น
+
+- **วินัย** การฝึกซ้อมตรงเวลาและสม่ำเสมอสร้างความรับผิดชอบ
+- **การทำงานเป็นทีม** เรียนรู้การสื่อสารและพึ่งพากันในสนาม
+- **ความมั่นใจ** ความสำเร็จเล็กๆ จากการฝึกซ้อมสะสมเป็นความเชื่อมั่นในตัวเอง
+- **การจัดการความผิดหวัง** เรียนรู้ที่จะลุกขึ้นใหม่หลังพ่ายแพ้
+
+ผู้ปกครองมีบทบาทสำคัญในการให้กำลังใจ ไม่กดดันผลแพ้ชนะมากเกินไป และชื่นชมความพยายามของลูกในทุกๆ ก้าว`,
+    },
+    {
+      slug: "tryout-preparation-guide",
+      title: "เตรียมตัวอย่างไรก่อนวันทดสอบเข้าทีม",
+      excerpt: "เคล็ดลับเตรียมตัวทั้งร่างกายและจิตใจก่อนวันทดสอบฝีเท้าที่สำคัญ",
+      cover: "seed-tryout-preparation-guide.jpg",
+      gradient: { from: "#0d5f3a", to: "#04140d", accent: "#e8ac2e" },
+      content: `## พร้อมทั้งกายและใจก่อนวันสำคัญ
+
+วันทดสอบฝีเท้าเป็นโอกาสสำคัญที่ต้องเตรียมตัวล่วงหน้า ทั้งด้านร่างกายและจิตใจ
+
+### เตรียมร่างกาย
+- นอนหลับให้เพียงพออย่างน้อย 7-8 ชั่วโมงก่อนวันทดสอบ
+- ฝึกซ้อมเบาๆ ในสัปดาห์สุดท้าย หลีกเลี่ยงการฝึกหนักจนเกินไป
+- เตรียมอุปกรณ์ให้พร้อม ทั้งรองเท้า สนับแข้ง และเสื้อผ้าที่ระบายอากาศได้ดี
+
+### เตรียมใจ
+- ตั้งเป้าหมายที่ทำได้จริง เช่น เล่นเต็มที่ตามความสามารถ ไม่กดดันตัวเองมากเกินไป
+- ฝึกหายใจลึกๆ เพื่อคลายความตื่นเต้นก่อนลงสนาม
+- จำไว้ว่าโค้ชมองหาพัฒนาการและทัศนคติ ไม่ใช่แค่ความเก่งเพียงอย่างเดียว
+
+มาถึงก่อนเวลาอย่างน้อย 30 นาที เพื่อวอร์มอัพร่างกายให้พร้อมก่อนเริ่มทดสอบ`,
+    },
+  ];
+
+  for (let i = 0; i < articleSeeds.length; i++) {
+    const seed = articleSeeds[i];
+    const coverImage = await ensureSeedCoverImage(seed.cover, seed.gradient);
+    const publishedAt = new Date(now.getTime() - (articleSeeds.length - i) * 3 * 24 * 60 * 60 * 1000);
+
+    await prisma.article.upsert({
+      where: { slug: seed.slug },
+      update: {},
+      create: {
+        slug: seed.slug,
+        title: seed.title,
+        excerpt: seed.excerpt,
+        content: seed.content,
+        coverImage,
+        authorId: admin.id,
+        published: true,
+        publishedAt,
       },
     });
   }

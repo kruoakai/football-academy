@@ -43,6 +43,10 @@ export async function createClinicActivityAction(
   const parsed = activitySchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "ข้อมูลไม่ถูกต้อง" };
 
+  if (published && !imageUrl) {
+    return { error: "กรุณาอัปโหลดรูปภาพก่อนเผยแพร่กิจกรรมนี้" };
+  }
+
   const maxOrder = await prisma.clinicActivity.aggregate({
     where: { category: parsed.data.category },
     _max: { sortOrder: true },
@@ -80,6 +84,13 @@ export async function updateClinicActivityAction(
   const parsed = activitySchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "ข้อมูลไม่ถูกต้อง" };
 
+  const existing = await prisma.clinicActivity.findUnique({ where: { id: activityId } });
+  if (!existing) return { error: "ไม่พบกิจกรรมนี้" };
+
+  if (published && !(imageUrl ?? existing.imageUrl)) {
+    return { error: "กรุณาอัปโหลดรูปภาพก่อนเผยแพร่กิจกรรมนี้" };
+  }
+
   await prisma.clinicActivity.update({
     where: { id: activityId },
     data: {
@@ -109,6 +120,11 @@ export async function toggleClinicActivityPublishedAction(activityId: string) {
   await requireRole(["ADMIN"]);
   const activity = await prisma.clinicActivity.findUnique({ where: { id: activityId } });
   if (!activity) return;
+
+  // Only guard the false -> true transition; hiding is always allowed.
+  if (!activity.published && !activity.imageUrl) {
+    redirect("/admin/clinic-activities?error=กรุณาอัปโหลดรูปภาพก่อนเผยแพร่กิจกรรมนี้");
+  }
 
   await prisma.clinicActivity.update({
     where: { id: activityId },

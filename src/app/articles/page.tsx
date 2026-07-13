@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function BlogPage() {
+export default async function ArticlesPage() {
   const articles = await prisma.article.findMany({
     where: { published: true },
     orderBy: { publishedAt: "desc" },
@@ -37,7 +37,7 @@ export default async function BlogPage() {
           {articles.map((a) => (
             <Link
               key={a.id}
-              href={`/blog/${a.slug}`}
+              href={`/articles/${a.slug}`}
               className="flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:border-pitch-300 hover:shadow-md"
             >
               {a.coverImage ? (

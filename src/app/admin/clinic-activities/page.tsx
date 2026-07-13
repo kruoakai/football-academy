@@ -23,9 +23,9 @@ const CATEGORY_ORDER = ["ASSESSMENT", "TREATMENT", "FIELD"] as const;
 export default async function AdminClinicActivitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; error?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, error } = await searchParams;
   const activeCategory = category && CATEGORY_ORDER.includes(category as (typeof CATEGORY_ORDER)[number])
     ? category
     : undefined;
@@ -51,6 +51,8 @@ export default async function AdminClinicActivitiesPage({
           + เพิ่มกิจกรรม
         </Link>
       </div>
+
+      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
       <div className="flex flex-wrap gap-2">
         <Link
@@ -130,7 +132,9 @@ export default async function AdminClinicActivitiesPage({
               <form action={toggleClinicActivityPublishedAction.bind(null, activity.id)}>
                 <button
                   type="submit"
-                  className="flex min-h-[36px] items-center justify-center rounded-lg border border-neutral-300 px-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                  disabled={!activity.published && !activity.imageUrl}
+                  title={!activity.published && !activity.imageUrl ? "กรุณาอัปโหลดรูปภาพก่อนเผยแพร่" : undefined}
+                  className="flex min-h-[36px] items-center justify-center rounded-lg border border-neutral-300 px-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:text-neutral-300"
                 >
                   {activity.published ? "ซ่อน" : "แสดง"}
                 </button>

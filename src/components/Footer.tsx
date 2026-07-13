@@ -53,7 +53,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="hover:text-gold-300">
+                <Link href="/articles" className="hover:text-gold-300">
                   {settings.navBlogLabel}
                 </Link>
               </li>
