@@ -194,7 +194,7 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
           </div>
           <div>
             <label className={labelClass} htmlFor="guardian.email">
-              อีเมล (ใช้เข้าสู่ระบบและรับลิงก์กู้คืนรหัสผ่าน)
+              อีเมล (ไม่บังคับ — ใช้สำหรับกู้คืนรหัสผ่านหากไม่มี LINE)
             </label>
             <input id="guardian.email" type="email" className={inputClass} {...register("guardian.email")} />
             {errors.guardian?.email && <p className={errorClass}>{errors.guardian.email.message}</p>}

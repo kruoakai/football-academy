@@ -8,7 +8,7 @@ export const guardianSchema = z.object({
     .string()
     .min(1, { error: "กรุณากรอกเบอร์โทรศัพท์" })
     .regex(/^0[0-9]{8,9}$/, { error: "เบอร์โทรศัพท์ไม่ถูกต้อง" }),
-  email: z.email({ error: "กรุณากรอกอีเมลให้ถูกต้อง" }),
+  email: z.union([z.literal(""), z.email({ error: "กรุณากรอกอีเมลให้ถูกต้อง" })]).optional(),
   password: z.string().min(8, { error: "รหัสผ่านอย่างน้อย 8 ตัวอักษร" }),
   leadSource: z.string().min(1, { error: "กรุณาเลือกว่ารู้จักเราจากไหน" }),
   referrerName: z.string().optional(),

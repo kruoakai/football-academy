@@ -57,6 +57,13 @@ export default function ForgotPasswordPage() {
             กลับไปหน้าเข้าสู่ระบบ
           </Link>
         </p>
+        <p className="mt-4 text-center text-xs text-neutral-500">
+          หากไม่มีอีเมลหรือ LINE ที่เชื่อมต่อไว้ ระบบจะไม่สามารถส่งลิงก์ให้ได้ กรุณา{" "}
+          <Link href="/contact" className="font-medium text-pitch-700 hover:underline">
+            ติดต่อเจ้าหน้าที่
+          </Link>{" "}
+          เพื่อขอให้ตั้งรหัสผ่านใหม่ให้
+        </p>
       </div>
     </div>
   );

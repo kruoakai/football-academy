@@ -32,6 +32,7 @@ const navItems = [
   { href: "/admin/articles", label: "บทความ", icon: <NewspaperIcon /> },
   { href: "/admin/campaigns", label: "แคมเปญ", icon: <MegaphoneIcon /> },
   { href: "/admin/reports", label: "รายงาน", icon: <ChartBarIcon /> },
+  { href: "/admin/members", label: "สมาชิก", icon: <UsersIcon /> },
   { href: "/admin/staff", label: "ทีมงาน", icon: <ShieldIcon /> },
 ];
 
