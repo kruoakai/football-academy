@@ -83,20 +83,30 @@ export default async function Home() {
           </div>
 
           <div className="flex-1">
-            <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 sm:max-w-md">
-              <div className="col-span-2 rounded-2xl bg-white/10 p-5 backdrop-blur">
-                <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
-                <p className="mt-1 text-sm text-white/70">{c.heroChip1Desc}</p>
+            {c.heroImageUrl ? (
+              <div className="relative mx-auto aspect-[4/3] w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl sm:max-w-md">
+                <Image src={c.heroImageUrl} alt={c.heroChip1Title} fill unoptimized className="object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pitch-950/80 to-transparent p-5">
+                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
+                  <p className="mt-1 text-sm text-white/80">{c.heroChip1Desc}</p>
+                </div>
               </div>
-              <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip2Title}</p>
-                <p className="mt-1 text-sm text-white/70">{c.heroChip2Desc}</p>
+            ) : (
+              <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 sm:max-w-md">
+                <div className="col-span-2 rounded-2xl bg-white/10 p-5 backdrop-blur">
+                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
+                  <p className="mt-1 text-sm text-white/70">{c.heroChip1Desc}</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip2Title}</p>
+                  <p className="mt-1 text-sm text-white/70">{c.heroChip2Desc}</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
+                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip3Title}</p>
+                  <p className="mt-1 text-sm text-white/70">{c.heroChip3Desc}</p>
+                </div>
               </div>
-              <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip3Title}</p>
-                <p className="mt-1 text-sm text-white/70">{c.heroChip3Desc}</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

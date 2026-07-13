@@ -430,6 +430,9 @@ model HomePageContent {
   heroChip2Desc          String @default("ทุกช่วงวัย")
   heroChip3Title         String @default("ฟื้นฟู")
   heroChip3Desc          String @default("คลินิกกายภาพ")
+  // When set, replaces the 3 small chip cards in the hero with a real photo —
+  // nullable so the chip fallback still works until an admin uploads one.
+  heroImageUrl           String?
 
   uspSectionTitle    String @default("สองมืออาชีพ หนึ่งเป้าหมาย")
   uspSectionSubtitle String @default("ความเชี่ยวชาญที่แตกต่างกัน ผสานกันเพื่อพัฒนานักเรียนอย่างรอบด้าน")

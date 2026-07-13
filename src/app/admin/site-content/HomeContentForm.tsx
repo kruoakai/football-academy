@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { inputClass, labelClass, errorClass, buttonPrimaryClass, cardClass } from "@/lib/admin-ui";
 import type { HomeContent } from "@/lib/home-content";
 import { updateHomeContentAction, type HomeContentFormState } from "./actions";
@@ -30,6 +30,55 @@ function Field({ name, label, value }: { name: string; label: string; value: str
       ) : (
         <input id={name} name={name} defaultValue={value} required className={inputClass} />
       )}
+    </div>
+  );
+}
+
+function HeroImageField({ currentUrl }: { currentUrl: string | null }) {
+  const [preview, setPreview] = useState<string | null>(currentUrl);
+  const [remove, setRemove] = useState(false);
+
+  return (
+    <div className="sm:col-span-2">
+      <label className={labelClass}>ภาพกิจกรรม (แทนที่การ์ดเล็ก 3 ใบเมื่อมีรูป)</label>
+      <div className="flex items-center gap-4">
+        <div className="flex h-20 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
+          {preview && !remove ? (
+            // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
+            <img src={preview} alt="ตัวอย่างภาพกิจกรรม" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-center text-[10px] text-neutral-400">ไม่มีรูป</span>
+          )}
+        </div>
+        <div className="flex-1">
+          <input
+            type="file"
+            name="heroImageFile"
+            accept="image/png,image/jpeg,image/webp"
+            className={inputClass}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setPreview(URL.createObjectURL(file));
+                setRemove(false);
+              }
+            }}
+          />
+          <p className="mt-1 text-xs text-neutral-500">PNG, JPEG หรือ WEBP ไม่เกิน 8MB — ระบบจะย่อขนาดให้เหมาะกับเว็บอัตโนมัติ</p>
+          {currentUrl && (
+            <label className="mt-2 flex items-center gap-2 text-xs text-neutral-600">
+              <input
+                type="checkbox"
+                name="removeHeroImage"
+                checked={remove}
+                onChange={(e) => setRemove(e.target.checked)}
+                className="h-4 w-4 rounded border-neutral-300"
+              />
+              ลบรูปนี้ (กลับไปแสดงการ์ดเล็ก 3 ใบแทน)
+            </label>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -69,6 +118,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="heroChip2Desc" label="การ์ดเล็ก 2 — คำอธิบาย" value={content.heroChip2Desc} />
         <Field name="heroChip3Title" label="การ์ดเล็ก 3 — หัวข้อ" value={content.heroChip3Title} />
         <Field name="heroChip3Desc" label="การ์ดเล็ก 3 — คำอธิบาย" value={content.heroChip3Desc} />
+        <HeroImageField currentUrl={content.heroImageUrl} />
       </Fieldset>
 
       <Fieldset title="สองมืออาชีพ หนึ่งเป้าหมาย (USP)">

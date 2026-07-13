@@ -52,7 +52,10 @@ export const HOME_CONTENT_FIELDS = [
 ] as const;
 
 export type HomeContentField = (typeof HOME_CONTENT_FIELDS)[number];
-export type HomeContent = Record<HomeContentField, string>;
+// heroImageUrl is separate from HOME_CONTENT_FIELDS/the form's required-text
+// schema below: it's optional (null = fall back to the chip cards), unlike
+// every other field which is always a non-empty string.
+export type HomeContent = Record<HomeContentField, string> & { heroImageUrl: string | null };
 
 // Mirrors the @default() values in prisma/schema.prisma — used as a safety net
 // if the singleton row hasn't been created yet (e.g. migration ran without seeding).
@@ -105,13 +108,14 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
   ctaTitle: "พร้อมให้ลูกของคุณก้าวสู่สนามหญ้าแล้วหรือยัง?",
   ctaDescription: "สมัครเรียนวันนี้ พร้อมรับการดูแลจากทีมโค้ชและนักกายภาพบำบัดมืออาชีพ",
   ctaButtonLabel: "เริ่มต้นเลย",
+  heroImageUrl: null,
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
   const row = await prisma.homePageContent.findUnique({ where: { id: HOMEPAGE_CONTENT_ID } });
   if (!row) return DEFAULT_HOME_CONTENT;
 
-  const content = {} as HomeContent;
+  const content = { heroImageUrl: row.heroImageUrl } as HomeContent;
   for (const field of HOME_CONTENT_FIELDS) {
     content[field] = row[field];
   }
