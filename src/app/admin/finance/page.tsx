@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { tableWrapClass, tableClass, thClass, tdClass, inputClass, labelClass, buttonSecondaryClass } from "@/lib/admin-ui";
 import { formatThaiDateTime } from "@/lib/thai";
@@ -112,15 +113,28 @@ export default async function AdminFinancePage({
                   <td className={tdClass}>{label}</td>
                   <td className={tdClass}>{Number(amount).toLocaleString()} บาท</td>
                   <td className={tdClass}>
-                    {b.payment ? `${bookingStatusLabel[b.status]} (${b.payment.method})` : bookingStatusLabel[b.status]}
+                    {b.payment?.status === "AWAITING_VERIFICATION"
+                      ? "รอตรวจสอบสลิป"
+                      : b.payment
+                        ? `${bookingStatusLabel[b.status]} (${b.payment.method})`
+                        : bookingStatusLabel[b.status]}
                   </td>
                   <td className={tdClass}>
-                    {b.status === "PENDING_PAYMENT" && (
-                      <form action={recordCashPaymentAction.bind(null, b.id)}>
-                        <button type="submit" className="text-sm font-medium text-pitch-700 hover:underline">
-                          บันทึกรับเงินสด
-                        </button>
-                      </form>
+                    {b.payment?.status === "AWAITING_VERIFICATION" ? (
+                      <Link
+                        href={`/admin/finance/verify/${b.id}`}
+                        className="text-sm font-medium text-gold-700 hover:underline"
+                      >
+                        ตรวจสอบสลิป
+                      </Link>
+                    ) : (
+                      b.status === "PENDING_PAYMENT" && (
+                        <form action={recordCashPaymentAction.bind(null, b.id)}>
+                          <button type="submit" className="text-sm font-medium text-pitch-700 hover:underline">
+                            บันทึกรับเงินสด
+                          </button>
+                        </form>
+                      )
                     )}
                   </td>
                 </tr>

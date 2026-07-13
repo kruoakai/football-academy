@@ -34,6 +34,7 @@ enum BookingStatus {
 
 enum PaymentStatus {
   PENDING
+  AWAITING_VERIFICATION
   PAID
   FAILED
 }
@@ -330,6 +331,14 @@ model Payment {
   amount    Decimal       @db.Decimal(10, 2)
   method    String
   status    PaymentStatus @default(PENDING)
+
+  // Bank-transfer / PromptPay slip verification flow
+  slipUrl          String?
+  slipSubmittedAt  DateTime?
+  verifiedByUserId String?
+  verifiedAt       DateTime?
+  rejectedReason   String?
+
   bookingId String        @unique
   booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   createdAt DateTime      @default(now())
@@ -468,6 +477,14 @@ model SiteSettings {
   // No file-upload system exists — admin pastes a hosted image URL, same
   // pattern as Article.coverImage. Default is the client-provided crest crop.
   logoUrl String? @default("/images/logo-mark.png")
+
+  // Payment receiving details for the bank-transfer/PromptPay flow at
+  // /pay/[bookingId] — all null until admin fills them in via
+  // /admin/site-settings. Payment page shows "not configured yet" if empty.
+  promptpayId       String?
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
 
   headerBrandPrefix    String @default("ยินผัน ")
   headerBrandHighlight String @default("ฟุตบอล อคาเดมี")

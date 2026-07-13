@@ -17,9 +17,26 @@ const logoUrlSchema = z.union([
   z.string().regex(/^\/[^\s]+$/, { error: "URL โลโก้ไม่ถูกต้อง" }),
 ]);
 
+const optionalText = z.string().optional();
+// PromptPay accepts a mobile number (10 digits) or citizen/tax ID (13 digits) — stored
+// with formatting characters stripped so src/lib/promptpay.ts can use it directly.
+const promptpayIdSchema = z.union([
+  z.literal(""),
+  z
+    .string()
+    .transform((v) => v.replace(/[^0-9]/g, ""))
+    .refine((v) => v.length === 10 || v.length === 13, {
+      error: "เบอร์พร้อมเพย์ต้องเป็นเบอร์โทร 10 หลัก หรือเลขบัตรประชาชน/ภาษี 13 หลัก",
+    }),
+]);
+
 const siteSettingsSchema = z.object({
   ...Object.fromEntries(SITE_SETTINGS_FIELDS.map((f) => [f, z.string().min(1, { error: "กรุณากรอกข้อความ" })])),
   logoUrl: logoUrlSchema.optional(),
+  promptpayId: promptpayIdSchema.optional(),
+  bankName: optionalText,
+  bankAccountNumber: optionalText,
+  bankAccountName: optionalText,
 });
 
 const ALLOWED_LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
@@ -62,7 +79,14 @@ export async function updateSiteSettingsAction(
     return { error: parsed.error.issues[0]?.message ?? "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบทุกช่อง" };
   }
 
-  const data = { ...parsed.data, logoUrl: uploadedLogoUrl ?? (parsed.data.logoUrl || null) };
+  const data = {
+    ...parsed.data,
+    logoUrl: uploadedLogoUrl ?? (parsed.data.logoUrl || null),
+    promptpayId: parsed.data.promptpayId || null,
+    bankName: parsed.data.bankName || null,
+    bankAccountNumber: parsed.data.bankAccountNumber || null,
+    bankAccountName: parsed.data.bankAccountName || null,
+  };
 
   await prisma.siteSettings.upsert({
     where: { id: SITE_SETTINGS_ID },

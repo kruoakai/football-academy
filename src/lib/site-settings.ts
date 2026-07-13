@@ -29,10 +29,16 @@ export const SITE_SETTINGS_FIELDS = [
 ] as const;
 
 export type SiteSettingsField = (typeof SITE_SETTINGS_FIELDS)[number];
-// logoUrl is separate from SITE_SETTINGS_FIELDS/the form's required-text schema
-// below: it's optional (null = use the built-in LogoMark icon instead of an
-// uploaded image), unlike every other field which is always a non-empty string.
-export type SiteSettings = Record<SiteSettingsField, string> & { logoUrl: string | null };
+// logoUrl and the payment fields are separate from SITE_SETTINGS_FIELDS/the
+// form's required-text schema below: they're optional (null = not configured
+// yet), unlike every other field which is always a non-empty string.
+export type SiteSettings = Record<SiteSettingsField, string> & {
+  logoUrl: string | null;
+  promptpayId: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  bankAccountName: string | null;
+};
 
 // Mirrors the @default() values in prisma/schema.prisma — used as a safety net
 // if the singleton row hasn't been created yet (e.g. migration ran without seeding).
@@ -61,13 +67,23 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   footerCopyrightText: "สงวนลิขสิทธิ์",
   contactHours: "จันทร์–อาทิตย์ 09:00–18:00 น.",
   logoUrl: "/images/logo-mark.png",
+  promptpayId: null,
+  bankName: null,
+  bankAccountNumber: null,
+  bankAccountName: null,
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   const row = await prisma.siteSettings.findUnique({ where: { id: SITE_SETTINGS_ID } });
   if (!row) return DEFAULT_SITE_SETTINGS;
 
-  const settings = { logoUrl: row.logoUrl } as SiteSettings;
+  const settings = {
+    logoUrl: row.logoUrl,
+    promptpayId: row.promptpayId,
+    bankName: row.bankName,
+    bankAccountNumber: row.bankAccountNumber,
+    bankAccountName: row.bankAccountName,
+  } as SiteSettings;
   for (const field of SITE_SETTINGS_FIELDS) {
     settings[field] = row[field];
   }

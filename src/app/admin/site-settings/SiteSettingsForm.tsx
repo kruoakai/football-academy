@@ -72,6 +72,33 @@ function Field({ name, label, value }: { name: string; label: string; value: str
   );
 }
 
+function OptionalField({
+  name,
+  label,
+  value,
+  placeholder,
+}: {
+  name: string;
+  label: string;
+  value: string | null;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className={labelClass} htmlFor={name}>
+        {label}
+      </label>
+      <input
+        id={name}
+        name={name}
+        defaultValue={value ?? ""}
+        placeholder={placeholder}
+        className={inputClass}
+      />
+    </div>
+  );
+}
+
 function Fieldset({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className={cardClass}>
@@ -131,6 +158,33 @@ export default function SiteSettingsForm({ settings }: { settings: SiteSettings 
       <Fieldset title="ส่วนท้าย (Footer) — ติดตามเรา">
         <Field name="footerFacebookText" label="Facebook" value={settings.footerFacebookText} />
         <Field name="footerInstagramText" label="Instagram" value={settings.footerInstagramText} />
+      </Fieldset>
+
+      <Fieldset title="ช่องทางรับชำระเงิน">
+        <div className="sm:col-span-2">
+          <p className="mb-1 text-sm text-neutral-600">
+            แสดงในหน้าชำระเงินของลูกค้า (/pay/...) — เว้นว่างช่องไหนไว้ ช่องทางนั้นจะไม่แสดง
+          </p>
+        </div>
+        <OptionalField
+          name="promptpayId"
+          label="เบอร์พร้อมเพย์ (หรือเลขบัตรประชาชน/ภาษี)"
+          value={settings.promptpayId}
+          placeholder="0812345678"
+        />
+        <OptionalField name="bankName" label="ชื่อธนาคาร" value={settings.bankName} placeholder="กสิกรไทย" />
+        <OptionalField
+          name="bankAccountNumber"
+          label="เลขบัญชี"
+          value={settings.bankAccountNumber}
+          placeholder="123-4-56789-0"
+        />
+        <OptionalField
+          name="bankAccountName"
+          label="ชื่อบัญชี"
+          value={settings.bankAccountName}
+          placeholder="ยินผัน ฟุตบอล อคาเดมี"
+        />
       </Fieldset>
 
       {state?.error && <p className={errorClass}>{state.error}</p>}

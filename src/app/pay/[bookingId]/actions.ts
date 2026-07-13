@@ -3,12 +3,11 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/dal";
-import { notifyLine } from "@/lib/line";
-import { formatThaiDateTime } from "@/lib/thai";
+import { saveResizedImage } from "@/lib/image-upload";
 
 export type PayState = { error?: string } | undefined;
 
-export async function mockPayAction(
+export async function submitPaymentSlipAction(
   bookingId: string,
   _prevState: PayState,
   formData: FormData
@@ -20,11 +19,20 @@ export async function mockPayAction(
     include: {
       schedule: { include: { course: true } },
       clinicService: true,
-      student: { include: { guardian: { include: { user: true } } } },
+      payment: true,
     },
   });
   if (!booking) redirect("/dashboard/bookings");
   if (booking.status !== "PENDING_PAYMENT") redirect(`/pay/${bookingId}`);
+  if (booking.payment?.status === "AWAITING_VERIFICATION") redirect(`/pay/${bookingId}`);
+
+  const slipFile = formData.get("slipFile");
+  if (!(slipFile instanceof File) || slipFile.size === 0) {
+    return { error: "กรุณาแนบรูปสลิปการโอนเงิน" };
+  }
+
+  const uploadResult = await saveResizedImage(slipFile, { subfolder: "payment-slips", maxWidth: 1200 });
+  if ("error" in uploadResult) return { error: uploadResult.error };
 
   const baseAmount =
     booking.type === "ACADEMY" ? Number(booking.schedule?.course.price ?? 0) : Number(booking.clinicService?.price ?? 0);
@@ -64,11 +72,29 @@ export async function mockPayAction(
 
   try {
     await prisma.$transaction(async (tx) => {
-      await tx.payment.create({
-        data: { userId: session.user.id, amount: finalAmount, method: "mock", status: "PAID", bookingId: booking.id },
+      await tx.payment.upsert({
+        where: { bookingId: booking.id },
+        create: {
+          userId: session.user.id,
+          amount: finalAmount,
+          method: "bank_transfer",
+          status: "AWAITING_VERIFICATION",
+          slipUrl: uploadResult.url,
+          slipSubmittedAt: new Date(),
+          bookingId: booking.id,
+        },
+        update: {
+          amount: finalAmount,
+          status: "AWAITING_VERIFICATION",
+          slipUrl: uploadResult.url,
+          slipSubmittedAt: new Date(),
+          rejectedReason: null,
+        },
       });
-      await tx.booking.update({ where: { id: booking.id }, data: { status: "CONFIRMED" } });
 
+      // Redeemed now (not deferred to admin approval) so behavior matches the
+      // rest of this app's promo handling — if the admin later rejects the
+      // slip, rejectPaymentSlipAction() undoes this redemption.
       if (promotionId) {
         const result = await tx.promotion.updateMany({
           where: {
@@ -84,8 +110,10 @@ export async function mockPayAction(
         if (result.count !== 1) {
           throw new Error("PROMO_RACE_CONDITION");
         }
-        await tx.promotionRedemption.create({
-          data: { promotionId, bookingId: booking.id, discountApplied },
+        await tx.promotionRedemption.upsert({
+          where: { bookingId: booking.id },
+          create: { promotionId, bookingId: booking.id, discountApplied },
+          update: { promotionId, discountApplied },
         });
       }
     });
@@ -96,11 +124,5 @@ export async function mockPayAction(
     throw error;
   }
 
-  const label = booking.type === "ACADEMY" ? booking.schedule?.course.name : booking.clinicService?.name;
-  await notifyLine(
-    booking.student.guardian.user.lineUserId,
-    `ยืนยันการจอง "${label}" ของ ${booking.student.name} วันที่ ${formatThaiDateTime(booking.date)} เรียบร้อยแล้ว`
-  );
-
-  redirect(`/dashboard/bookings/${booking.id}`);
+  redirect(`/pay/${bookingId}`);
 }
