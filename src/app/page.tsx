@@ -43,6 +43,14 @@ export default async function Home() {
     { age: c.program3Age, name: c.program3Name, desc: c.program3Desc },
   ];
 
+  const heroTiles = [
+    { url: c.heroTile1Url, label: c.heroTile1Label },
+    { url: c.heroTile2Url, label: c.heroTile2Label },
+    { url: c.heroTile3Url, label: c.heroTile3Label },
+    { url: c.heroTile4Url, label: c.heroTile4Label },
+  ];
+  const hasHeroMedia = !!(c.heroVideoUrl || heroTiles.some((t) => t.url));
+
   return (
     <div className="flex flex-col">
       <script
@@ -52,8 +60,8 @@ export default async function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-pitch-900 via-pitch-800 to-pitch-950 text-white">
         <div className="absolute inset-0 opacity-10 [background:repeating-linear-gradient(90deg,white_0px,white_2px,transparent_2px,transparent_80px)]" />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 py-16 text-center sm:px-6 sm:py-24 lg:flex-row lg:text-left lg:py-28">
-          <div className="flex-1">
+        <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24 lg:text-left lg:py-28">
+          <div className="mx-auto max-w-2xl lg:mx-0">
             <span className="inline-block rounded-full bg-gold-500/15 px-4 py-1 text-sm font-medium text-gold-300">
               {c.heroBadge}
             </span>
@@ -82,17 +90,39 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="flex-1">
-            {c.heroImageUrl ? (
-              <div className="relative mx-auto aspect-[4/3] w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl sm:max-w-md">
-                <Image src={c.heroImageUrl} alt={c.heroChip1Title} fill unoptimized className="object-cover" />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pitch-950/80 to-transparent p-5">
-                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
-                  <p className="mt-1 text-sm text-white/80">{c.heroChip1Desc}</p>
+          <div className="mt-12">
+            {hasHeroMedia ? (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+                <div className="lg:col-span-2">
+                  {c.heroVideoUrl ? (
+                    <video
+                      src={c.heroVideoUrl}
+                      controls
+                      className="aspect-video w-full rounded-2xl object-cover shadow-xl"
+                    />
+                  ) : (
+                    <div className="flex aspect-video w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-4 text-center text-sm text-white/50">
+                      วิดีโอบรรยากาศฝึกซ้อม
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4 lg:col-span-3">
+                  {heroTiles.map((tile, i) => (
+                    <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-lg">
+                      {tile.url ? (
+                        <Image src={tile.url} alt={tile.label} fill unoptimized className="object-cover" />
+                      ) : (
+                        <div className="h-full w-full border-2 border-dashed border-white/20 bg-white/5" />
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pitch-950/85 to-transparent p-3">
+                        <p className="text-sm font-medium text-white">{tile.label}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : (
-              <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 sm:max-w-md">
+              <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 sm:max-w-md lg:mx-0">
                 <div className="col-span-2 rounded-2xl bg-white/10 p-5 backdrop-blur">
                   <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
                   <p className="mt-1 text-sm text-white/70">{c.heroChip1Desc}</p>

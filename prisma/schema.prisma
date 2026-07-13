@@ -430,9 +430,19 @@ model HomePageContent {
   heroChip2Desc          String @default("ทุกช่วงวัย")
   heroChip3Title         String @default("ฟื้นฟู")
   heroChip3Desc          String @default("คลินิกกายภาพ")
-  // When set, replaces the 3 small chip cards in the hero with a real photo —
-  // nullable so the chip fallback still works until an admin uploads one.
-  heroImageUrl           String?
+  // When any of these is set, the hero's visual side switches from the 3
+  // text-chip cards to a training video + 4-photo-tile grid. URLs are
+  // nullable (each piece can be filled in independently); labels always
+  // have a value so a tile still shows sensible text before an image exists.
+  heroVideoUrl   String?
+  heroTile1Url   String?
+  heroTile1Label String  @default("เด็กเล็กฝึกทักษะ")
+  heroTile2Url   String?
+  heroTile2Label String  @default("แข่งขันรุ่นเยาวชน")
+  heroTile3Url   String?
+  heroTile3Label String  @default("คลินิกกายภาพ")
+  heroTile4Url   String?
+  heroTile4Label String  @default("โค้ชสอนเทคนิค")
 
   uspSectionTitle    String @default("สองมืออาชีพ หนึ่งเป้าหมาย")
   uspSectionSubtitle String @default("ความเชี่ยวชาญที่แตกต่างกัน ผสานกันเพื่อพัฒนานักเรียนอย่างรอบด้าน")

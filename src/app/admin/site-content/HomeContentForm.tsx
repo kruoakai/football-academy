@@ -34,27 +34,26 @@ function Field({ name, label, value }: { name: string; label: string; value: str
   );
 }
 
-function HeroImageField({ currentUrl }: { currentUrl: string | null }) {
+function HeroVideoField({ currentUrl }: { currentUrl: string | null }) {
   const [preview, setPreview] = useState<string | null>(currentUrl);
   const [remove, setRemove] = useState(false);
 
   return (
     <div className="sm:col-span-2">
-      <label className={labelClass}>ภาพกิจกรรม (แทนที่การ์ดเล็ก 3 ใบเมื่อมีรูป)</label>
-      <div className="flex items-center gap-4">
-        <div className="flex h-20 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
+      <label className={labelClass}>วิดีโอบรรยากาศฝึกซ้อม (16:9)</label>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <div className="flex aspect-video w-full max-w-xs shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
           {preview && !remove ? (
-            // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
-            <img src={preview} alt="ตัวอย่างภาพกิจกรรม" className="h-full w-full object-cover" />
+            <video src={preview} className="h-full w-full object-cover" muted controls />
           ) : (
-            <span className="text-center text-[10px] text-neutral-400">ไม่มีรูป</span>
+            <span className="text-center text-xs text-neutral-400">ไม่มีวิดีโอ</span>
           )}
         </div>
         <div className="flex-1">
           <input
             type="file"
-            name="heroImageFile"
-            accept="image/png,image/jpeg,image/webp"
+            name="heroVideoFile"
+            accept="video/mp4,video/webm"
             className={inputClass}
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -64,21 +63,82 @@ function HeroImageField({ currentUrl }: { currentUrl: string | null }) {
               }
             }}
           />
-          <p className="mt-1 text-xs text-neutral-500">PNG, JPEG หรือ WEBP ไม่เกิน 8MB — ระบบจะย่อขนาดให้เหมาะกับเว็บอัตโนมัติ</p>
+          <p className="mt-1 text-xs text-neutral-500">MP4 หรือ WEBM ไม่เกิน 50MB — แสดงแทนกรอบวิดีโอฝั่งซ้ายของ Hero</p>
           {currentUrl && (
             <label className="mt-2 flex items-center gap-2 text-xs text-neutral-600">
               <input
                 type="checkbox"
-                name="removeHeroImage"
+                name="removeHeroVideo"
                 checked={remove}
                 onChange={(e) => setRemove(e.target.checked)}
                 className="h-4 w-4 rounded border-neutral-300"
               />
-              ลบรูปนี้ (กลับไปแสดงการ์ดเล็ก 3 ใบแทน)
+              ลบวิดีโอนี้
             </label>
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function HeroTileField({
+  index,
+  currentUrl,
+  labelValue,
+}: {
+  index: 1 | 2 | 3 | 4;
+  currentUrl: string | null;
+  labelValue: string;
+}) {
+  const [preview, setPreview] = useState<string | null>(currentUrl);
+  const [remove, setRemove] = useState(false);
+  const fileFieldName = `heroTile${index}File`;
+  const removeFieldName = `removeHeroTile${index}`;
+  const labelFieldName = `heroTile${index}Label`;
+
+  return (
+    <div className="rounded-xl border border-neutral-200 p-4">
+      <p className="mb-2 text-sm font-semibold text-pitch-800">ภาพกิจกรรม {index}</p>
+      <div className="flex h-28 w-full items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-pitch-50">
+        {preview && !remove ? (
+          // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
+          <img src={preview} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <span className="text-xs text-neutral-400">ไม่มีรูป</span>
+        )}
+      </div>
+      <div className="mt-2">
+        <label className={labelClass} htmlFor={labelFieldName}>
+          ป้ายข้อความ
+        </label>
+        <input id={labelFieldName} name={labelFieldName} defaultValue={labelValue} required className={inputClass} />
+      </div>
+      <input
+        type="file"
+        name={fileFieldName}
+        accept="image/png,image/jpeg,image/webp"
+        className={`${inputClass} mt-2`}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setPreview(URL.createObjectURL(file));
+            setRemove(false);
+          }
+        }}
+      />
+      {currentUrl && (
+        <label className="mt-2 flex items-center gap-2 text-xs text-neutral-600">
+          <input
+            type="checkbox"
+            name={removeFieldName}
+            checked={remove}
+            onChange={(e) => setRemove(e.target.checked)}
+            className="h-4 w-4 rounded border-neutral-300"
+          />
+          ลบรูปนี้
+        </label>
+      )}
     </div>
   );
 }
@@ -118,7 +178,19 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="heroChip2Desc" label="การ์ดเล็ก 2 — คำอธิบาย" value={content.heroChip2Desc} />
         <Field name="heroChip3Title" label="การ์ดเล็ก 3 — หัวข้อ" value={content.heroChip3Title} />
         <Field name="heroChip3Desc" label="การ์ดเล็ก 3 — คำอธิบาย" value={content.heroChip3Desc} />
-        <HeroImageField currentUrl={content.heroImageUrl} />
+        <p className="sm:col-span-2 text-xs text-neutral-500">
+          การ์ดเล็ก 3 ใบด้านบนจะแสดงเฉพาะตอนที่ยังไม่มีวิดีโอหรือภาพกิจกรรมด้านล่างนี้เลย
+        </p>
+      </Fieldset>
+
+      <Fieldset title="วิดีโอและภาพกิจกรรม (แทนที่การ์ดเล็กเมื่อมีอย่างน้อย 1 รายการ)">
+        <HeroVideoField currentUrl={content.heroVideoUrl} />
+        <div className="sm:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <HeroTileField index={1} currentUrl={content.heroTile1Url} labelValue={content.heroTile1Label} />
+          <HeroTileField index={2} currentUrl={content.heroTile2Url} labelValue={content.heroTile2Label} />
+          <HeroTileField index={3} currentUrl={content.heroTile3Url} labelValue={content.heroTile3Label} />
+          <HeroTileField index={4} currentUrl={content.heroTile4Url} labelValue={content.heroTile4Label} />
+        </div>
       </Fieldset>
 
       <Fieldset title="สองมืออาชีพ หนึ่งเป้าหมาย (USP)">

@@ -49,13 +49,24 @@ export const HOME_CONTENT_FIELDS = [
   "ctaTitle",
   "ctaDescription",
   "ctaButtonLabel",
+  "heroTile1Label",
+  "heroTile2Label",
+  "heroTile3Label",
+  "heroTile4Label",
 ] as const;
 
 export type HomeContentField = (typeof HOME_CONTENT_FIELDS)[number];
-// heroImageUrl is separate from HOME_CONTENT_FIELDS/the form's required-text
-// schema below: it's optional (null = fall back to the chip cards), unlike
-// every other field which is always a non-empty string.
-export type HomeContent = Record<HomeContentField, string> & { heroImageUrl: string | null };
+// The video/tile *URLs* are separate from HOME_CONTENT_FIELDS/the form's
+// required-text schema below: each is optional (null = show a placeholder),
+// unlike every other field (including the tile labels) which is always a
+// non-empty string.
+export type HomeContent = Record<HomeContentField, string> & {
+  heroVideoUrl: string | null;
+  heroTile1Url: string | null;
+  heroTile2Url: string | null;
+  heroTile3Url: string | null;
+  heroTile4Url: string | null;
+};
 
 // Mirrors the @default() values in prisma/schema.prisma — used as a safety net
 // if the singleton row hasn't been created yet (e.g. migration ran without seeding).
@@ -108,14 +119,28 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
   ctaTitle: "พร้อมให้ลูกของคุณก้าวสู่สนามหญ้าแล้วหรือยัง?",
   ctaDescription: "สมัครเรียนวันนี้ พร้อมรับการดูแลจากทีมโค้ชและนักกายภาพบำบัดมืออาชีพ",
   ctaButtonLabel: "เริ่มต้นเลย",
-  heroImageUrl: null,
+  heroTile1Label: "เด็กเล็กฝึกทักษะ",
+  heroTile2Label: "แข่งขันรุ่นเยาวชน",
+  heroTile3Label: "คลินิกกายภาพ",
+  heroTile4Label: "โค้ชสอนเทคนิค",
+  heroVideoUrl: null,
+  heroTile1Url: null,
+  heroTile2Url: null,
+  heroTile3Url: null,
+  heroTile4Url: null,
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
   const row = await prisma.homePageContent.findUnique({ where: { id: HOMEPAGE_CONTENT_ID } });
   if (!row) return DEFAULT_HOME_CONTENT;
 
-  const content = { heroImageUrl: row.heroImageUrl } as HomeContent;
+  const content = {
+    heroVideoUrl: row.heroVideoUrl,
+    heroTile1Url: row.heroTile1Url,
+    heroTile2Url: row.heroTile2Url,
+    heroTile3Url: row.heroTile3Url,
+    heroTile4Url: row.heroTile4Url,
+  } as HomeContent;
   for (const field of HOME_CONTENT_FIELDS) {
     content[field] = row[field];
   }
