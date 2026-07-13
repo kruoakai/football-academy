@@ -61,11 +61,16 @@ export default async function AdminStaffPage({
                   </span>
                 </td>
                 <td className={tdClass}>
-                  <form action={toggleActiveAction.bind(null, u.id)}>
-                    <button type="submit" className="text-sm font-medium text-pitch-700 hover:underline">
-                      {u.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}
-                    </button>
-                  </form>
+                  <div className="flex justify-end gap-3">
+                    <Link href={`/admin/staff/${u.id}`} className="text-sm font-medium text-pitch-700 hover:underline">
+                      แก้ไข
+                    </Link>
+                    <form action={toggleActiveAction.bind(null, u.id)}>
+                      <button type="submit" className="text-sm font-medium text-neutral-600 hover:underline">
+                        {u.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             ))}
