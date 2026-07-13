@@ -50,6 +50,7 @@ export default async function PayPage({
   let finalAmount = baseAmount;
   let promoError: string | null = null;
   let promoApplied = false;
+  let promoEffect: string | null = null;
   const promoCodeRaw = promo?.trim().toUpperCase();
   if (promoCodeRaw) {
     const promotion = await prisma.promotion.findUnique({ where: { code: promoCodeRaw } });
@@ -65,6 +66,9 @@ export default async function PayPage({
             ? (baseAmount * Number(promotion.value ?? 0)) / 100
             : Number(promotion.value ?? 0);
         finalAmount = Math.max(0, baseAmount - discount);
+        promoEffect = `ลด ${discount.toLocaleString()} บาท`;
+      } else {
+        promoEffect = `รับ${promotion.giftItem}ฟรี — ยอดชำระไม่เปลี่ยนแปลง ทีมงานจะเตรียมของแถมให้เมื่อยืนยันการจอง`;
       }
       promoApplied = true;
     }
@@ -92,7 +96,11 @@ export default async function PayPage({
             <p className="text-sm text-neutral-400 line-through">{baseAmount.toLocaleString()} บาท</p>
           )}
           <p className="font-heading text-2xl font-bold text-pitch-900">{finalAmount.toLocaleString()} บาท</p>
-          {promoApplied && <p className="mt-1 text-xs font-medium text-pitch-700">ใช้โค้ด {promoCodeRaw} แล้ว</p>}
+          {promoApplied && (
+            <p className="mt-1 text-xs font-medium text-pitch-700">
+              ใช้โค้ด {promoCodeRaw} แล้ว — {promoEffect}
+            </p>
+          )}
         </div>
 
         {booking.status !== "PENDING_PAYMENT" ? (

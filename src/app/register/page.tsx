@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { getActivePromotions } from "@/lib/promotions";
 import RegistrationWizard, { type CourseOption } from "./RegistrationWizard";
+import PromotionsBanner from "./PromotionsBanner";
 
 export const metadata: Metadata = {
   title: "สมัครเรียน | ยินผัน ฟุตบอล อคาเดมี",
@@ -11,6 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
+  const promotions = await getActivePromotions();
   const courses = await prisma.course.findMany({
     include: {
       batches: {
@@ -56,6 +59,8 @@ export default async function RegisterPage() {
           กรอกข้อมูล 4 ขั้นตอนง่ายๆ เพื่อเริ่มต้นเส้นทางนักฟุตบอลของบุตรหลาน
         </p>
       </div>
+
+      <PromotionsBanner promotions={promotions} />
 
       <RegistrationWizard courses={courseOptions} />
     </div>
