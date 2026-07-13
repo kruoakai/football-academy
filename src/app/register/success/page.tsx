@@ -37,13 +37,22 @@ export default async function RegisterSuccessPage() {
               <p className="font-heading text-lg font-semibold text-pitch-900">{s.name}</p>
               <p className="text-sm text-neutral-600">รหัสนักเรียน: {s.code}</p>
             </div>
-            <Image
-              src={qrCodes[i]}
-              alt={`QR โค้ดสำหรับเช็คชื่อของ ${s.name}`}
-              width={140}
-              height={140}
-              unoptimized
-            />
+            <div className="flex flex-col items-center gap-2">
+              <Image
+                src={qrCodes[i]}
+                alt={`QR โค้ดสำหรับเช็คชื่อของ ${s.name}`}
+                width={140}
+                height={140}
+                unoptimized
+              />
+              <a
+                href={qrCodes[i]}
+                download={`qr-${s.code}.png`}
+                className="text-sm font-medium text-pitch-700 hover:underline"
+              >
+                ดาวน์โหลด QR
+              </a>
+            </div>
           </div>
         ))}
       </div>

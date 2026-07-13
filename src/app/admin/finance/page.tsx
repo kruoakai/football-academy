@@ -36,6 +36,7 @@ export default async function AdminFinancePage({
       schedule: { include: { course: true } },
       clinicService: true,
       payment: true,
+      promotionRedemption: { include: { promotion: true } },
     },
     orderBy: { date: "desc" },
   });
@@ -110,7 +111,14 @@ export default async function AdminFinancePage({
                 <tr key={b.id}>
                   <td className={tdClass}>{formatThaiDateTime(b.date)}</td>
                   <td className={tdClass}>{b.student.name}</td>
-                  <td className={tdClass}>{label}</td>
+                  <td className={tdClass}>
+                    {label}
+                    {b.promotionRedemption && (
+                      <span className="ml-2 rounded-full bg-gold-50 px-2 py-0.5 text-xs font-medium text-gold-700">
+                        โค้ด {b.promotionRedemption.promotion.code}
+                      </span>
+                    )}
+                  </td>
                   <td className={tdClass}>{Number(amount).toLocaleString()} บาท</td>
                   <td className={tdClass}>
                     {b.payment?.status === "AWAITING_VERIFICATION"

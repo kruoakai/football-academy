@@ -23,6 +23,7 @@ export default async function VerifySlipPage({ params }: { params: Promise<{ boo
       schedule: { include: { course: true } },
       clinicService: true,
       payment: true,
+      promotionRedemption: { include: { promotion: true } },
     },
   });
   if (!booking || !booking.payment || !booking.payment.slipUrl) notFound();
@@ -65,6 +66,17 @@ export default async function VerifySlipPage({ params }: { params: Promise<{ boo
                 {Number(booking.payment.amount).toLocaleString()} บาท
               </dd>
             </div>
+            {booking.promotionRedemption && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-neutral-500">โปรโมชั่นที่ใช้</dt>
+                <dd className="text-right font-medium text-gold-700">
+                  {booking.promotionRedemption.promotion.code}
+                  {booking.promotionRedemption.discountApplied
+                    ? ` (ลด ${Number(booking.promotionRedemption.discountApplied).toLocaleString()} บาท)`
+                    : ""}
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between gap-4">
               <dt className="text-neutral-500">ส่งสลิปเมื่อ</dt>
               <dd className="text-right font-medium text-pitch-900">

@@ -5,7 +5,13 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/dal";
 import { notifyLine } from "@/lib/line";
+import { sendEmail } from "@/lib/email";
 import { formatThaiDateTime } from "@/lib/thai";
+
+async function notifyPaymentStatus(user: { email: string | null; lineUserId: string | null }, subject: string, text: string) {
+  if (user.email) await sendEmail(user.email, subject, `<p>${text}</p>`);
+  if (user.lineUserId) await notifyLine(user.lineUserId, text);
+}
 
 export async function recordCashPaymentAction(bookingId: string) {
   await requireRole(["ADMIN"]);
@@ -27,15 +33,18 @@ export async function recordCashPaymentAction(bookingId: string) {
     booking.type === "ACADEMY" ? Number(booking.schedule?.course.price ?? 0) : Number(booking.clinicService?.price ?? 0);
 
   await prisma.$transaction([
-    prisma.payment.create({
-      data: { userId: booking.student.guardian.userId, amount, method: "cash", status: "PAID", bookingId },
+    prisma.payment.upsert({
+      where: { bookingId },
+      create: { userId: booking.student.guardian.userId, amount, method: "cash", status: "PAID", bookingId },
+      update: { amount, method: "cash", status: "PAID", rejectedReason: null, slipUrl: null, slipSubmittedAt: null },
     }),
     prisma.booking.update({ where: { id: bookingId }, data: { status: "CONFIRMED" } }),
   ]);
 
   const label = booking.type === "ACADEMY" ? booking.schedule?.course.name : booking.clinicService?.name;
-  await notifyLine(
-    booking.student.guardian.user.lineUserId,
+  await notifyPaymentStatus(
+    booking.student.guardian.user,
+    "ยืนยันการชำระเงิน - ยินผัน ฟุตบอล อคาเดมี",
     `รับชำระเงินสดสำหรับ "${label}" ของ ${booking.student.name} วันที่ ${formatThaiDateTime(booking.date)} เรียบร้อยแล้ว`
   );
 
@@ -69,8 +78,9 @@ export async function approvePaymentSlipAction(bookingId: string) {
   ]);
 
   const label = booking.type === "ACADEMY" ? booking.schedule?.course.name : booking.clinicService?.name;
-  await notifyLine(
-    booking.student.guardian.user.lineUserId,
+  await notifyPaymentStatus(
+    booking.student.guardian.user,
+    "ยืนยันการชำระเงิน - ยินผัน ฟุตบอล อคาเดมี",
     `ตรวจสอบสลิปการโอนเงินสำหรับ "${label}" ของ ${booking.student.name} วันที่ ${formatThaiDateTime(booking.date)} ผ่านแล้ว ยืนยันการจองเรียบร้อย`
   );
 
@@ -124,8 +134,9 @@ export async function rejectPaymentSlipAction(
   });
 
   const label = booking.type === "ACADEMY" ? booking.schedule?.course.name : booking.clinicService?.name;
-  await notifyLine(
-    booking.student.guardian.user.lineUserId,
+  await notifyPaymentStatus(
+    booking.student.guardian.user,
+    "สลิปไม่ผ่านการตรวจสอบ - ยินผัน ฟุตบอล อคาเดมี",
     `สลิปการโอนเงินสำหรับ "${label}" ของ ${booking.student.name} ไม่ผ่านการตรวจสอบ: ${reason} กรุณาอัปโหลดสลิปใหม่`
   );
 

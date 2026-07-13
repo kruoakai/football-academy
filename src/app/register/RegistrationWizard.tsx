@@ -272,7 +272,11 @@ export default function RegistrationWizard({ courses }: { courses: CourseOption[
                 </div>
                 <div>
                   <label className={labelClass}>ระดับพื้นฐาน (ไม่บังคับ)</label>
-                  <input className={inputClass} {...register(`students.${index}.level` as const)} />
+                  <input
+                    className={inputClass}
+                    placeholder="เช่น ไม่มีพื้นฐาน, เคยเล่นมาก่อน, ทีมโรงเรียน"
+                    {...register(`students.${index}.level` as const)}
+                  />
                 </div>
               </div>
             </div>
