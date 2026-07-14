@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { inputClass, labelClass, errorClass, buttonPrimaryClass, cardClass } from "@/lib/admin-ui";
 import type { HomeContent } from "@/lib/home-content";
+import VideoEmbed from "@/components/VideoEmbed";
 import { updateHomeContentAction, type HomeContentFormState } from "./actions";
 
 const textareaFields = new Set([
@@ -34,17 +35,29 @@ function Field({ name, label, value }: { name: string; label: string; value: str
   );
 }
 
-function HeroVideoField({ currentUrl }: { currentUrl: string | null }) {
+function HeroVideoField({
+  currentUrl,
+  currentEmbedUrl,
+}: {
+  currentUrl: string | null;
+  currentEmbedUrl: string | null;
+}) {
   const [preview, setPreview] = useState<string | null>(currentUrl);
   const [remove, setRemove] = useState(false);
+  const [embedUrl, setEmbedUrl] = useState(currentEmbedUrl ?? "");
+
+  const showFilePreview = preview && !remove;
+  const showEmbedPreview = !showFilePreview && embedUrl.trim();
 
   return (
     <div className="sm:col-span-2">
       <label className={labelClass}>วิดีโอบรรยากาศฝึกซ้อม (16:9)</label>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <div className="flex aspect-video w-full max-w-xs shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
-          {preview && !remove ? (
+          {showFilePreview ? (
             <video src={preview} className="h-full w-full object-cover" muted controls />
+          ) : showEmbedPreview ? (
+            <VideoEmbed url={embedUrl.trim()} className="!rounded-none !shadow-none" />
           ) : (
             <span className="text-center text-xs text-neutral-400">ไม่มีวิดีโอ</span>
           )}
@@ -76,6 +89,24 @@ function HeroVideoField({ currentUrl }: { currentUrl: string | null }) {
               ลบวิดีโอนี้
             </label>
           )}
+
+          <div className="mt-3 border-t border-neutral-200 pt-3">
+            <label className={labelClass} htmlFor="heroVideoEmbedUrl">
+              หรือวางลิงก์วิดีโอ (YouTube, Facebook, TikTok ฯลฯ)
+            </label>
+            <input
+              id="heroVideoEmbedUrl"
+              type="url"
+              name="heroVideoEmbedUrl"
+              value={embedUrl}
+              onChange={(e) => setEmbedUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-neutral-500">
+              ถ้ามีการอัปโหลดไฟล์วิดีโอด้วย ระบบจะแสดงไฟล์ที่อัปโหลดก่อนเสมอ
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -184,7 +215,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
       </Fieldset>
 
       <Fieldset title="วิดีโอและภาพกิจกรรม (แทนที่การ์ดเล็กเมื่อมีอย่างน้อย 1 รายการ)">
-        <HeroVideoField currentUrl={content.heroVideoUrl} />
+        <HeroVideoField currentUrl={content.heroVideoUrl} currentEmbedUrl={content.heroVideoEmbedUrl} />
         <div className="sm:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <HeroTileField index={1} currentUrl={content.heroTile1Url} labelValue={content.heroTile1Label} />
           <HeroTileField index={2} currentUrl={content.heroTile2Url} labelValue={content.heroTile2Label} />

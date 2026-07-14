@@ -62,6 +62,7 @@ export type HomeContentField = (typeof HOME_CONTENT_FIELDS)[number];
 // non-empty string.
 export type HomeContent = Record<HomeContentField, string> & {
   heroVideoUrl: string | null;
+  heroVideoEmbedUrl: string | null;
   heroTile1Url: string | null;
   heroTile2Url: string | null;
   heroTile3Url: string | null;
@@ -124,6 +125,7 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
   heroTile3Label: "คลินิกกายภาพ",
   heroTile4Label: "โค้ชสอนเทคนิค",
   heroVideoUrl: null,
+  heroVideoEmbedUrl: null,
   heroTile1Url: null,
   heroTile2Url: null,
   heroTile3Url: null,
@@ -136,6 +138,7 @@ export async function getHomeContent(): Promise<HomeContent> {
 
   const content = {
     heroVideoUrl: row.heroVideoUrl,
+    heroVideoEmbedUrl: row.heroVideoEmbedUrl,
     heroTile1Url: row.heroTile1Url,
     heroTile2Url: row.heroTile2Url,
     heroTile3Url: row.heroTile3Url,

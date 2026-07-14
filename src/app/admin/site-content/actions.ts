@@ -40,6 +40,19 @@ export async function updateHomeContentAction(
     mediaUpdates.heroVideoUrl = null;
   }
 
+  // Link alternative to the file upload (YouTube/Facebook/TikTok/etc.) — a plain
+  // optional URL, not part of the required-string HOME_CONTENT_FIELDS schema below.
+  const videoEmbedUrlRaw = formData.get("heroVideoEmbedUrl");
+  formData.delete("heroVideoEmbedUrl");
+  const videoEmbedUrl = typeof videoEmbedUrlRaw === "string" ? videoEmbedUrlRaw.trim() : "";
+  if (videoEmbedUrl) {
+    const urlCheck = z.url({ error: "ลิงก์วิดีโอไม่ถูกต้อง" }).safeParse(videoEmbedUrl);
+    if (!urlCheck.success) return { error: urlCheck.error.issues[0]?.message ?? "ลิงก์วิดีโอไม่ถูกต้อง" };
+    mediaUpdates.heroVideoEmbedUrl = videoEmbedUrl;
+  } else {
+    mediaUpdates.heroVideoEmbedUrl = null;
+  }
+
   for (const key of TILE_KEYS) {
     const file = formData.get(`${key}File`);
     const remove = formData.get(`remove${key[0].toUpperCase()}${key.slice(1)}`) === "on";

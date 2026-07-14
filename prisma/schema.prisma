@@ -435,6 +435,9 @@ model HomePageContent {
   // nullable (each piece can be filled in independently); labels always
   // have a value so a tile still shows sensible text before an image exists.
   heroVideoUrl   String?
+  // Alternative to heroVideoUrl (uploaded file): a pasted YouTube/Facebook/TikTok
+  // link, embedded client-side. Upload takes priority over this when both are set.
+  heroVideoEmbedUrl String?
   heroTile1Url   String?
   heroTile1Label String  @default("เด็กเล็กฝึกทักษะ")
   heroTile2Url   String?

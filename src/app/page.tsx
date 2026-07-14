@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import { getHomeContent } from "@/lib/home-content";
 import { formatThaiDate } from "@/lib/thai";
+import VideoEmbed from "@/components/VideoEmbed";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,7 @@ export default async function Home() {
     { url: c.heroTile3Url, label: c.heroTile3Label },
     { url: c.heroTile4Url, label: c.heroTile4Label },
   ];
-  const hasHeroMedia = !!(c.heroVideoUrl || heroTiles.some((t) => t.url));
+  const hasHeroMedia = !!(c.heroVideoUrl || c.heroVideoEmbedUrl || heroTiles.some((t) => t.url));
 
   return (
     <div className="flex flex-col">
@@ -100,6 +101,8 @@ export default async function Home() {
                       controls
                       className="aspect-video w-full rounded-2xl object-cover shadow-xl"
                     />
+                  ) : c.heroVideoEmbedUrl ? (
+                    <VideoEmbed url={c.heroVideoEmbedUrl} />
                   ) : (
                     <div className="flex aspect-video w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-4 text-center text-sm text-white/50">
                       วิดีโอบรรยากาศฝึกซ้อม
