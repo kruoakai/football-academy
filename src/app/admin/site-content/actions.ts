@@ -5,7 +5,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/dal";
 import { saveResizedImage } from "@/lib/image-upload";
-import { saveVideoFile } from "@/lib/video-upload";
 import { HOME_CONTENT_FIELDS, HOMEPAGE_CONTENT_ID } from "@/lib/home-content";
 
 const homeContentSchema = z.object(
@@ -28,17 +27,14 @@ export async function updateHomeContentAction(
   // an explicit checkbox rather than relying on an empty file input.
   const mediaUpdates: Record<string, string | null> = {};
 
-  const videoFile = formData.get("heroVideoFile");
-  const removeVideo = formData.get("removeHeroVideo") === "on";
-  formData.delete("heroVideoFile");
-  formData.delete("removeHeroVideo");
-  if (videoFile instanceof File && videoFile.size > 0) {
-    const result = await saveVideoFile(videoFile, { subfolder: "home" });
-    if ("error" in result) return { error: result.error };
-    mediaUpdates.heroVideoUrl = result.url;
-  } else if (removeVideo) {
-    mediaUpdates.heroVideoUrl = null;
-  }
+  // The video file itself is uploaded client-side via a direct fetch() to
+  // /api/admin/upload-video (see HeroVideoField) — large files through this
+  // Server Action's multipart body are flaky in Next.js dev. Only the
+  // resulting URL arrives here, as a plain optional text field.
+  const videoUrlRaw = formData.get("heroVideoUrl");
+  formData.delete("heroVideoUrl");
+  const videoUrl = typeof videoUrlRaw === "string" ? videoUrlRaw.trim() : "";
+  mediaUpdates.heroVideoUrl = videoUrl || null;
 
   // Link alternative to the file upload (YouTube/Facebook/TikTok/etc.) — a plain
   // optional URL, not part of the required-string HOME_CONTENT_FIELDS schema below.

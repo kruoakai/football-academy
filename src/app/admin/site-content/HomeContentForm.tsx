@@ -35,6 +35,8 @@ function Field({ name, label, value }: { name: string; label: string; value: str
   );
 }
 
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+
 function HeroVideoField({
   currentUrl,
   currentEmbedUrl,
@@ -42,19 +44,63 @@ function HeroVideoField({
   currentUrl: string | null;
   currentEmbedUrl: string | null;
 }) {
+  // Uploaded via a direct fetch() to /api/admin/upload-video on file select,
+  // not bundled into this form's Server Action submission — large video files
+  // through a Server Action's multipart body are flaky in Next.js dev
+  // (Turbopack), throwing a raw "Unexpected end of form" crash before our own
+  // size check ever runs. The resolved URL is carried as a plain hidden text
+  // field instead, same as every other text field in this form.
+  const [videoUrl, setVideoUrl] = useState(currentUrl ?? "");
   const [preview, setPreview] = useState<string | null>(currentUrl);
-  const [remove, setRemove] = useState(false);
   const [embedUrl, setEmbedUrl] = useState(currentEmbedUrl ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const showFilePreview = preview && !remove;
+  const showFilePreview = preview && videoUrl;
   const showEmbedPreview = !showFilePreview && embedUrl.trim();
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError(null);
+
+    if (file.size > MAX_VIDEO_BYTES) {
+      setUploadError("ไฟล์วิดีโอต้องมีขนาดไม่เกิน 50MB");
+      e.target.value = "";
+      return;
+    }
+
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await fetch("/api/admin/upload-video", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error ?? "อัปโหลดวิดีโอไม่สำเร็จ");
+        setPreview(currentUrl);
+        return;
+      }
+      setVideoUrl(data.url);
+    } catch {
+      setUploadError("อัปโหลดวิดีโอไม่สำเร็จ กรุณาลองใหม่");
+      setPreview(currentUrl);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   return (
     <div className="sm:col-span-2">
       <label className={labelClass}>วิดีโอบรรยากาศฝึกซ้อม (16:9)</label>
+      <input type="hidden" name="heroVideoUrl" value={videoUrl} />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <div className="flex aspect-video w-full max-w-xs shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
-          {showFilePreview ? (
+          {uploading ? (
+            <span className="text-center text-xs text-neutral-400">กำลังอัปโหลด...</span>
+          ) : showFilePreview ? (
             <video src={preview} className="h-full w-full object-cover" muted controls />
           ) : showEmbedPreview ? (
             <VideoEmbed url={embedUrl.trim()} className="!rounded-none !shadow-none" />
@@ -65,25 +111,26 @@ function HeroVideoField({
         <div className="flex-1">
           <input
             type="file"
-            name="heroVideoFile"
             accept="video/mp4,video/webm"
+            disabled={uploading}
             className={inputClass}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                setPreview(URL.createObjectURL(file));
-                setRemove(false);
-              }
-            }}
+            onChange={handleFileChange}
           />
           <p className="mt-1 text-xs text-neutral-500">MP4 หรือ WEBM ไม่เกิน 50MB — แสดงแทนกรอบวิดีโอฝั่งซ้ายของ Hero</p>
-          {currentUrl && (
+          {uploadError && <p className={`mt-1 ${errorClass}`}>{uploadError}</p>}
+          {videoUrl && (
             <label className="mt-2 flex items-center gap-2 text-xs text-neutral-600">
               <input
                 type="checkbox"
-                name="removeHeroVideo"
-                checked={remove}
-                onChange={(e) => setRemove(e.target.checked)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setVideoUrl("");
+                    setPreview(null);
+                  } else {
+                    setVideoUrl(currentUrl ?? "");
+                    setPreview(currentUrl);
+                  }
+                }}
                 className="h-4 w-4 rounded border-neutral-300"
               />
               ลบวิดีโอนี้
