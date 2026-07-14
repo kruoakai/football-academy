@@ -255,6 +255,22 @@ model ClinicActivity {
   @@map("clinic_activities")
 }
 
+/// Photo rows for the public /gallery page — admin-managed via /admin/gallery.
+/// Each row requires an image (a gallery is nothing without one); caption is
+/// optional. published + sortOrder control show/hide and display order,
+/// same convention as ClinicActivity.
+model GalleryPhoto {
+  id        String   @id @default(cuid())
+  caption   String?
+  imageUrl  String
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery_photos")
+}
+
 /// PDPA access-control note: this table is intentionally NOT legally reviewed yet
 /// (see CLAUDE.md). Every read/write path MUST be gated to Role.ADMIN only —
 /// do not relax this without a completed PDPA review.

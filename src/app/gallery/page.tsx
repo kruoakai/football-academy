@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
+import GalleryGrid from "./GalleryGrid";
 
 export const metadata: Metadata = {
   title: "แกลเลอรี่ | ยินผัน ฟุตบอล อคาเดมี",
   description: "ภาพบรรยากาศการฝึกซ้อม กิจกรรม และคลินิกกายภาพของยินผัน ฟุตบอล อคาเดมี",
 };
 
-// No real academy photos or an image-upload system exist yet — these are
-// placeholder tiles (by category) so the page has honest, non-misleading
-// content until real photos are uploaded. Swap for next/image once photos exist.
-const galleryItems = [
-  { label: "บรรยากาศการฝึกซ้อม", gradient: "from-pitch-700 to-pitch-950" },
-  { label: "การแข่งขันกระชับมิตร", gradient: "from-pitch-600 to-pitch-900" },
-  { label: "คลินิกกายภาพบำบัด", gradient: "from-pitch-800 to-pitch-950" },
-  { label: "ค่ายฟุตบอลเยาวชน", gradient: "from-pitch-700 to-pitch-900" },
-  { label: "กิจกรรมนักเรียน", gradient: "from-pitch-600 to-pitch-950" },
-  { label: "ประเมินสภาพร่างกาย", gradient: "from-pitch-800 to-pitch-900" },
-];
+export const dynamic = "force-dynamic";
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const photos = await prisma.galleryPhoto.findMany({
+    where: { published: true },
+    orderBy: { sortOrder: "asc" },
+  });
+
   return (
     <div className="flex flex-col">
       <section className="bg-gradient-to-br from-pitch-900 via-pitch-800 to-pitch-950 text-white">
@@ -29,25 +26,24 @@ export default function GalleryPage() {
             ภาพบรรยากาศของสถาบัน
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-white/80">
-            ภาพกิจกรรมจริงกำลังจะอัปเดตเร็วๆ นี้ — ด้านล่างคือหมวดหมู่ภาพที่จะนำมาแสดง
+            ภาพการฝึกซ้อม การแข่งขัน และคลินิกกายภาพบำบัดของยินผัน ฟุตบอล อคาเดมี
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {galleryItems.map((item) => (
-            <div
-              key={item.label}
-              className={`flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl bg-gradient-to-br ${item.gradient} p-6 text-center shadow-sm`}
-              role="img"
-              aria-label={`ภาพตัวอย่าง: ${item.label} (รอภาพจริง)`}
-            >
-              <span className="font-heading text-2xl font-bold text-gold-400">YP</span>
-              <span className="text-sm font-medium text-white/80">{item.label}</span>
-            </div>
-          ))}
-        </div>
+      {/* w-full is required here (not just mx-auto): this section's flex-column
+          parent gives block content shrink-to-fit width by default, which is
+          normally invisible for text content but collapses CSS Grid `fr`
+          tracks to 0 when the grid's children (aspect-ratio + Image fill)
+          have no intrinsic size of their own to break the circularity. */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        {photos.length > 0 ? (
+          <GalleryGrid photos={photos.map((p) => ({ id: p.id, imageUrl: p.imageUrl, caption: p.caption }))} />
+        ) : (
+          <div className="rounded-2xl border border-dashed border-neutral-300 p-14 text-center text-neutral-500">
+            ภาพกิจกรรมจริงกำลังจะอัปเดตเร็วๆ นี้
+          </div>
+        )}
       </section>
     </div>
   );

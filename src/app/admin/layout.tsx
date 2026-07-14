@@ -28,6 +28,7 @@ const navItems = [
   { href: "/admin/students", label: "นักเรียน", icon: <UsersIcon /> },
   { href: "/admin/clinic-services", label: "บริการคลินิก", icon: <HeartPulseIcon /> },
   { href: "/admin/clinic-activities", label: "กิจกรรมคลินิก", icon: <HeartPulseIcon /> },
+  { href: "/admin/gallery", label: "แกลเลอรี่", icon: <GridIcon /> },
   { href: "/admin/finance", label: "การเงิน", icon: <CurrencyIcon /> },
   { href: "/admin/promotions", label: "โปรโมชั่น", icon: <TagIcon /> },
   { href: "/admin/articles", label: "บทความ", icon: <NewspaperIcon /> },
