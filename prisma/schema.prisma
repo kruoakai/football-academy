@@ -416,6 +416,7 @@ model Campaign {
 model HomePageContent {
   id String @id @default("homepage")
 
+  showHeroBadge          Boolean @default(true)
   heroBadge              String @default("ยินผัน ฟุตบอล อคาเดมี")
   heroTitleLine1         String @default("สอนโดย")
   heroTitleHighlight1    String @default("ทีมชาติ")
@@ -453,8 +454,10 @@ model HomePageContent {
   // Each section (and each repeated card within it) can be independently
   // hidden from the public page without deleting its saved text, so admins
   // can turn parts off/on without losing content to re-type later.
-  showUspSection     Boolean @default(true)
+  showUspSection        Boolean @default(true)
+  showUspSectionTitle    Boolean @default(true)
   uspSectionTitle    String @default("สองมืออาชีพ หนึ่งเป้าหมาย")
+  showUspSectionSubtitle Boolean @default(true)
   uspSectionSubtitle String @default("ความเชี่ยวชาญที่แตกต่างกัน ผสานกันเพื่อพัฒนานักเรียนอย่างรอบด้าน")
   showUsp1           Boolean @default(true)
   usp1Tag            String @default("โค้ชหลัก")
@@ -468,6 +471,7 @@ model HomePageContent {
   usp2Desc           String @default("อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม ดูแลคลินิกกายภาพและฟื้นฟูของสถาบันโดยตรง ลดความเสี่ยงบาดเจ็บและเสริมสมรรถภาพนักกีฬา")
 
   showHighlightsSection  Boolean @default(true)
+  showHighlightsSectionTitle Boolean @default(true)
   highlightsSectionTitle String @default("ทำไมต้องยินผัน ฟุตบอล อคาเดมี")
   showHighlight1         Boolean @default(true)
   highlight1Title        String @default("หลักสูตรตามช่วงวัย")
@@ -480,7 +484,9 @@ model HomePageContent {
   highlight3Desc         String @default("ตารางฝึกซ้อม การนัดหมาย และผลการเข้าเรียน แจ้งเตือนถึงผู้ปกครองแบบเรียลไทม์")
 
   showProgramsSection     Boolean @default(true)
+  showProgramsSectionTitle Boolean @default(true)
   programsSectionTitle    String @default("คอร์สเรียนตามช่วงวัย")
+  showProgramsSectionSubtitle Boolean @default(true)
   programsSectionSubtitle String @default("ตัวอย่างการจัดกลุ่มรุ่น — รายละเอียดคอร์สฉบับเต็มเร็วๆ นี้")
   showProgram1            Boolean @default(true)
   program1Age             String @default("6–9 ปี")
@@ -498,6 +504,7 @@ model HomePageContent {
   showArticlesSection Boolean @default(true)
 
   showCtaSection Boolean @default(true)
+  showCtaTitle   Boolean @default(true)
   ctaTitle       String @default("พร้อมให้ลูกของคุณก้าวสู่สนามหญ้าแล้วหรือยัง?")
   ctaDescription String @default("สมัครเรียนวันนี้ พร้อมรับการดูแลจากทีมโค้ชและนักกายภาพบำบัดมืออาชีพ")
   ctaButtonLabel String @default("เริ่มต้นเลย")

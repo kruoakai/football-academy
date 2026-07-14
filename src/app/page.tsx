@@ -69,9 +69,11 @@ export default async function Home() {
         <div className="absolute inset-0 opacity-10 [background:repeating-linear-gradient(90deg,white_0px,white_2px,transparent_2px,transparent_80px)]" />
         <div className="relative mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24 lg:text-left lg:py-28">
           <div className="mx-auto max-w-2xl lg:mx-0">
-            <span className="inline-block rounded-full bg-gold-500/15 px-4 py-1 text-sm font-medium text-gold-300">
-              {c.heroBadge}
-            </span>
+            {c.showHeroBadge && (
+              <span className="inline-block rounded-full bg-gold-500/15 px-4 py-1 text-sm font-medium text-gold-300">
+                {c.heroBadge}
+              </span>
+            )}
             <h1 className="mt-4 font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
               {c.heroTitleLine1}
               <span className="text-gold-400">{c.heroTitleHighlight1}</span>
@@ -151,8 +153,10 @@ export default async function Home() {
       {c.showUspSection && usps.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="text-center">
-            <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">{c.uspSectionTitle}</h2>
-            <p className="mt-2 text-neutral-600">{c.uspSectionSubtitle}</p>
+            {c.showUspSectionTitle && (
+              <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">{c.uspSectionTitle}</h2>
+            )}
+            {c.showUspSectionSubtitle && <p className="mt-2 text-neutral-600">{c.uspSectionSubtitle}</p>}
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -177,9 +181,11 @@ export default async function Home() {
       {c.showHighlightsSection && highlights.length > 0 && (
         <section className="bg-pitch-50">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-            <h2 className="text-center font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
-              {c.highlightsSectionTitle}
-            </h2>
+            {c.showHighlightsSectionTitle && (
+              <h2 className="text-center font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
+                {c.highlightsSectionTitle}
+              </h2>
+            )}
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
               {highlights.map((h) => (
                 <div key={h.title} className="rounded-xl bg-white p-6 shadow-sm">
@@ -240,10 +246,12 @@ export default async function Home() {
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
-              <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
-                {c.programsSectionTitle}
-              </h2>
-              <p className="mt-2 text-neutral-600">{c.programsSectionSubtitle}</p>
+              {c.showProgramsSectionTitle && (
+                <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
+                  {c.programsSectionTitle}
+                </h2>
+              )}
+              {c.showProgramsSectionSubtitle && <p className="mt-2 text-neutral-600">{c.programsSectionSubtitle}</p>}
             </div>
           </div>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -265,7 +273,7 @@ export default async function Home() {
       {c.showCtaSection && (
         <section className="bg-pitch-900">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 sm:py-20">
-            <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">{c.ctaTitle}</h2>
+            {c.showCtaTitle && <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">{c.ctaTitle}</h2>}
             <p className="max-w-xl text-white/80">{c.ctaDescription}</p>
             <Link
               href="/register"
