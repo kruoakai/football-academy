@@ -4,82 +4,8 @@ import { useActionState, useState } from "react";
 import { inputClass, labelClass, errorClass, buttonPrimaryClass, cardClass } from "@/lib/admin-ui";
 import type { HomeContent } from "@/lib/home-content";
 import VideoEmbed from "@/components/VideoEmbed";
+import { VisibilityToggle, CardHeader, Field, Fieldset } from "@/components/admin/ContentFormControls";
 import { updateHomeContentAction, type HomeContentFormState } from "./actions";
-
-const textareaFields = new Set([
-  "heroDescription",
-  "usp1Desc",
-  "usp2Desc",
-  "highlight1Desc",
-  "highlight2Desc",
-  "highlight3Desc",
-  "program1Desc",
-  "program2Desc",
-  "program3Desc",
-  "ctaDescription",
-]);
-
-function VisibilityToggle({
-  name,
-  defaultChecked,
-  label = "แสดงส่วนนี้บนหน้าแรก",
-}: {
-  name: string;
-  defaultChecked: boolean;
-  label?: string;
-}) {
-  return (
-    <label className="inline-flex shrink-0 items-center gap-2 text-xs font-medium text-neutral-600">
-      <input
-        type="checkbox"
-        name={name}
-        defaultChecked={defaultChecked}
-        className="h-4 w-4 rounded border-neutral-300 text-pitch-600 focus:ring-pitch-500"
-      />
-      {label}
-    </label>
-  );
-}
-
-function CardHeader({ title, toggleName, defaultChecked }: { title: string; toggleName: string; defaultChecked: boolean }) {
-  return (
-    <div className="flex items-center justify-between border-t border-neutral-200 pt-4 sm:col-span-2">
-      <p className="text-sm font-semibold text-pitch-800">{title}</p>
-      <VisibilityToggle name={toggleName} defaultChecked={defaultChecked} label="แสดงการ์ดนี้" />
-    </div>
-  );
-}
-
-function Field({
-  name,
-  label,
-  value,
-  toggleName,
-  toggleChecked,
-}: {
-  name: string;
-  label: string;
-  value: string;
-  toggleName?: string;
-  toggleChecked?: boolean;
-}) {
-  const isTextarea = textareaFields.has(name);
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-2">
-        <label className={labelClass} htmlFor={name}>
-          {label}
-        </label>
-        {toggleName && <VisibilityToggle name={toggleName} defaultChecked={!!toggleChecked} label="แสดง" />}
-      </div>
-      {isTextarea ? (
-        <textarea id={name} name={name} defaultValue={value} rows={3} required className={inputClass} />
-      ) : (
-        <input id={name} name={name} defaultValue={value} required className={inputClass} />
-      )}
-    </div>
-  );
-}
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
@@ -267,26 +193,6 @@ function HeroTileField({
   );
 }
 
-function Fieldset({
-  title,
-  toggle,
-  children,
-}: {
-  title: string;
-  toggle?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cardClass}>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-heading text-lg font-semibold text-pitch-900">{title}</h2>
-        {toggle}
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{children}</div>
-    </div>
-  );
-}
-
 export default function HomeContentForm({ content }: { content: HomeContent }) {
   const [state, formAction, pending] = useActionState<HomeContentFormState, FormData>(
     updateHomeContentAction,
@@ -309,7 +215,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="heroTitleLine2" label="หัวข้อ บรรทัด 2" value={content.heroTitleLine2} />
         <Field name="heroTitleHighlight2" label="หัวข้อ คำเน้นสีทอง 2" value={content.heroTitleHighlight2} />
         <div className="sm:col-span-2">
-          <Field name="heroDescription" label="คำอธิบายใต้หัวข้อ" value={content.heroDescription} />
+          <Field name="heroDescription" label="คำอธิบายใต้หัวข้อ" value={content.heroDescription} multiline />
         </div>
         <Field name="heroCtaPrimaryLabel" label="ปุ่มหลัก" value={content.heroCtaPrimaryLabel} />
         <Field name="heroCtaSecondaryLabel" label="ปุ่มรอง" value={content.heroCtaSecondaryLabel} />
@@ -365,7 +271,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="usp1Title" label="การ์ด 1 — หัวข้อ" value={content.usp1Title} />
         <Field name="usp1Name" label="การ์ด 1 — ชื่อ" value={content.usp1Name} />
         <div className="sm:col-span-2">
-          <Field name="usp1Desc" label="การ์ด 1 — คำอธิบาย" value={content.usp1Desc} />
+          <Field name="usp1Desc" label="การ์ด 1 — คำอธิบาย" value={content.usp1Desc} multiline />
         </div>
 
         <CardHeader title="การ์ด 2" toggleName="showUsp2" defaultChecked={content.showUsp2} />
@@ -373,7 +279,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="usp2Title" label="การ์ด 2 — หัวข้อ" value={content.usp2Title} />
         <Field name="usp2Name" label="การ์ด 2 — ชื่อ" value={content.usp2Name} />
         <div className="sm:col-span-2">
-          <Field name="usp2Desc" label="การ์ด 2 — คำอธิบาย" value={content.usp2Desc} />
+          <Field name="usp2Desc" label="การ์ด 2 — คำอธิบาย" value={content.usp2Desc} multiline />
         </div>
       </Fieldset>
 
@@ -393,15 +299,15 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
 
         <CardHeader title="การ์ด 1" toggleName="showHighlight1" defaultChecked={content.showHighlight1} />
         <Field name="highlight1Title" label="การ์ด 1 — หัวข้อ" value={content.highlight1Title} />
-        <Field name="highlight1Desc" label="การ์ด 1 — คำอธิบาย" value={content.highlight1Desc} />
+        <Field name="highlight1Desc" label="การ์ด 1 — คำอธิบาย" value={content.highlight1Desc} multiline />
 
         <CardHeader title="การ์ด 2" toggleName="showHighlight2" defaultChecked={content.showHighlight2} />
         <Field name="highlight2Title" label="การ์ด 2 — หัวข้อ" value={content.highlight2Title} />
-        <Field name="highlight2Desc" label="การ์ด 2 — คำอธิบาย" value={content.highlight2Desc} />
+        <Field name="highlight2Desc" label="การ์ด 2 — คำอธิบาย" value={content.highlight2Desc} multiline />
 
         <CardHeader title="การ์ด 3" toggleName="showHighlight3" defaultChecked={content.showHighlight3} />
         <Field name="highlight3Title" label="การ์ด 3 — หัวข้อ" value={content.highlight3Title} />
-        <Field name="highlight3Desc" label="การ์ด 3 — คำอธิบาย" value={content.highlight3Desc} />
+        <Field name="highlight3Desc" label="การ์ด 3 — คำอธิบาย" value={content.highlight3Desc} multiline />
       </Fieldset>
 
       <Fieldset
@@ -427,21 +333,21 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
         <Field name="program1Age" label="การ์ด 1 — ช่วงอายุ" value={content.program1Age} />
         <Field name="program1Name" label="การ์ด 1 — ชื่อรุ่น" value={content.program1Name} />
         <div className="sm:col-span-2">
-          <Field name="program1Desc" label="การ์ด 1 — คำอธิบาย" value={content.program1Desc} />
+          <Field name="program1Desc" label="การ์ด 1 — คำอธิบาย" value={content.program1Desc} multiline />
         </div>
 
         <CardHeader title="การ์ด 2" toggleName="showProgram2" defaultChecked={content.showProgram2} />
         <Field name="program2Age" label="การ์ด 2 — ช่วงอายุ" value={content.program2Age} />
         <Field name="program2Name" label="การ์ด 2 — ชื่อรุ่น" value={content.program2Name} />
         <div className="sm:col-span-2">
-          <Field name="program2Desc" label="การ์ด 2 — คำอธิบาย" value={content.program2Desc} />
+          <Field name="program2Desc" label="การ์ด 2 — คำอธิบาย" value={content.program2Desc} multiline />
         </div>
 
         <CardHeader title="การ์ด 3" toggleName="showProgram3" defaultChecked={content.showProgram3} />
         <Field name="program3Age" label="การ์ด 3 — ช่วงอายุ" value={content.program3Age} />
         <Field name="program3Name" label="การ์ด 3 — ชื่อรุ่น" value={content.program3Name} />
         <div className="sm:col-span-2">
-          <Field name="program3Desc" label="การ์ด 3 — คำอธิบาย" value={content.program3Desc} />
+          <Field name="program3Desc" label="การ์ด 3 — คำอธิบาย" value={content.program3Desc} multiline />
         </div>
       </Fieldset>
 
@@ -472,7 +378,7 @@ export default function HomeContentForm({ content }: { content: HomeContent }) {
           />
         </div>
         <div className="sm:col-span-2">
-          <Field name="ctaDescription" label="คำอธิบาย" value={content.ctaDescription} />
+          <Field name="ctaDescription" label="คำอธิบาย" value={content.ctaDescription} multiline />
         </div>
         <Field name="ctaButtonLabel" label="ข้อความปุ่ม" value={content.ctaButtonLabel} />
       </Fieldset>
