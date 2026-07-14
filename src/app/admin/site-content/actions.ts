@@ -5,7 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/dal";
 import { saveResizedImage } from "@/lib/image-upload";
-import { HOME_CONTENT_FIELDS, HOMEPAGE_CONTENT_ID } from "@/lib/home-content";
+import { HOME_CONTENT_FIELDS, HOME_VISIBILITY_FIELDS, HOMEPAGE_CONTENT_ID } from "@/lib/home-content";
 
 const homeContentSchema = z.object(
   Object.fromEntries(HOME_CONTENT_FIELDS.map((f) => [f, z.string().min(1, { error: "กรุณากรอกข้อความ" })]))
@@ -63,12 +63,20 @@ export async function updateHomeContentAction(
     }
   }
 
+  // Show/hide checkboxes: an unchecked checkbox is simply absent from the
+  // submitted FormData, so presence itself is the boolean value.
+  const visibilityUpdates: Record<string, boolean> = {};
+  for (const field of HOME_VISIBILITY_FIELDS) {
+    visibilityUpdates[field] = formData.get(field) === "on";
+    formData.delete(field);
+  }
+
   const parsed = homeContentSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบทุกช่อง" };
   }
 
-  const data = { ...parsed.data, ...mediaUpdates };
+  const data = { ...parsed.data, ...mediaUpdates, ...visibilityUpdates };
 
   await prisma.homePageContent.upsert({
     where: { id: HOMEPAGE_CONTENT_ID },

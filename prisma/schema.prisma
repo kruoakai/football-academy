@@ -426,10 +426,13 @@ model HomePageContent {
   heroCtaSecondaryLabel  String @default("รู้จักเรามากขึ้น")
   heroChip1Title         String @default("โค้ช + นักกายภาพ")
   heroChip1Desc          String @default("ทีมงานมืออาชีพในที่เดียว")
+  showHeroChip1          Boolean @default(true)
   heroChip2Title         String @default("ฝึกซ้อม")
   heroChip2Desc          String @default("ทุกช่วงวัย")
+  showHeroChip2          Boolean @default(true)
   heroChip3Title         String @default("ฟื้นฟู")
   heroChip3Desc          String @default("คลินิกกายภาพ")
+  showHeroChip3          Boolean @default(true)
   // When any of these is set, the hero's visual side switches from the 3
   // text-chip cards to a training video + 4-photo-tile grid. URLs are
   // nullable (each piece can be filled in independently); labels always
@@ -447,37 +450,54 @@ model HomePageContent {
   heroTile4Url   String?
   heroTile4Label String  @default("โค้ชสอนเทคนิค")
 
+  // Each section (and each repeated card within it) can be independently
+  // hidden from the public page without deleting its saved text, so admins
+  // can turn parts off/on without losing content to re-type later.
+  showUspSection     Boolean @default(true)
   uspSectionTitle    String @default("สองมืออาชีพ หนึ่งเป้าหมาย")
   uspSectionSubtitle String @default("ความเชี่ยวชาญที่แตกต่างกัน ผสานกันเพื่อพัฒนานักเรียนอย่างรอบด้าน")
+  showUsp1           Boolean @default(true)
   usp1Tag            String @default("โค้ชหลัก")
   usp1Title          String @default("สอนโดยอดีตนักเตะทีมชาติ")
   usp1Name           String @default("ภานุวัฒน์ ยินผัน")
   usp1Desc           String @default("อดีตนักฟุตบอลทีมชาติไทย ติดทีมดาราเอเชีย (Asian All-Star) หลายสมัย ถ่ายทอดเทคนิคและประสบการณ์ระดับนานาชาติสู่นักเรียนทุกรุ่น")
+  showUsp2           Boolean @default(true)
   usp2Tag            String @default("หัวหน้าคลินิก")
   usp2Title          String @default("ฟื้นฟูโดยมืออาชีพ")
   usp2Name           String @default("ผู้ร่วมก่อตั้ง / นักกายภาพบำบัด")
   usp2Desc           String @default("อดีตนักกายภาพบำบัดประจำทีมฟุตบอลหลายทีม ดูแลคลินิกกายภาพและฟื้นฟูของสถาบันโดยตรง ลดความเสี่ยงบาดเจ็บและเสริมสมรรถภาพนักกีฬา")
 
+  showHighlightsSection  Boolean @default(true)
   highlightsSectionTitle String @default("ทำไมต้องยินผัน ฟุตบอล อคาเดมี")
+  showHighlight1         Boolean @default(true)
   highlight1Title        String @default("หลักสูตรตามช่วงวัย")
   highlight1Desc         String @default("ออกแบบการฝึกให้เหมาะกับพัฒนาการของนักเรียนแต่ละรุ่น ตั้งแต่ระดับเริ่มต้นถึงระดับแข่งขัน")
+  showHighlight2         Boolean @default(true)
   highlight2Title        String @default("ดูแลครบวงจร")
   highlight2Desc         String @default("ฝึกซ้อมฟุตบอลควบคู่การประเมินร่างกายและฟื้นฟูอาการบาดเจ็บ โดยทีมงานเฉพาะทาง")
+  showHighlight3         Boolean @default(true)
   highlight3Title        String @default("แจ้งเตือนผ่าน LINE")
   highlight3Desc         String @default("ตารางฝึกซ้อม การนัดหมาย และผลการเข้าเรียน แจ้งเตือนถึงผู้ปกครองแบบเรียลไทม์")
 
+  showProgramsSection     Boolean @default(true)
   programsSectionTitle    String @default("คอร์สเรียนตามช่วงวัย")
   programsSectionSubtitle String @default("ตัวอย่างการจัดกลุ่มรุ่น — รายละเอียดคอร์สฉบับเต็มเร็วๆ นี้")
+  showProgram1            Boolean @default(true)
   program1Age             String @default("6–9 ปี")
   program1Name            String @default("เยาวชนเริ่มต้น")
   program1Desc            String @default("ปูพื้นฐานทักษะบอลและความสนุกในการเล่น")
+  showProgram2            Boolean @default(true)
   program2Age             String @default("10–13 ปี")
   program2Name            String @default("เยาวชนพัฒนา")
   program2Desc            String @default("พัฒนาเทคนิคเฉพาะตำแหน่งและการอ่านเกม")
+  showProgram3            Boolean @default(true)
   program3Age             String @default("14–18 ปี")
   program3Name            String @default("เยาวชนสู่ทีมชาติ")
   program3Desc            String @default("ยกระดับสู่การแข่งขันและเตรียมความพร้อมสู่ทีมระดับสูง")
 
+  showArticlesSection Boolean @default(true)
+
+  showCtaSection Boolean @default(true)
   ctaTitle       String @default("พร้อมให้ลูกของคุณก้าวสู่สนามหญ้าแล้วหรือยัง?")
   ctaDescription String @default("สมัครเรียนวันนี้ พร้อมรับการดูแลจากทีมโค้ชและนักกายภาพบำบัดมืออาชีพ")
   ctaButtonLabel String @default("เริ่มต้นเลย")

@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE "home_page_content" ADD COLUMN     "showArticlesSection" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showCtaSection" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHeroChip1" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHeroChip2" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHeroChip3" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHighlight1" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHighlight2" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHighlight3" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showHighlightsSection" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showProgram1" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showProgram2" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showProgram3" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showProgramsSection" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showUsp1" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showUsp2" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "showUspSection" BOOLEAN NOT NULL DEFAULT true;

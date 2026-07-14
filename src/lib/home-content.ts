@@ -56,18 +56,44 @@ export const HOME_CONTENT_FIELDS = [
 ] as const;
 
 export type HomeContentField = (typeof HOME_CONTENT_FIELDS)[number];
+
+// Independent show/hide toggles — one per section, one per repeated card
+// within a section — so admins can turn parts of the home page off without
+// losing the saved text underneath.
+export const HOME_VISIBILITY_FIELDS = [
+  "showHeroChip1",
+  "showHeroChip2",
+  "showHeroChip3",
+  "showUspSection",
+  "showUsp1",
+  "showUsp2",
+  "showHighlightsSection",
+  "showHighlight1",
+  "showHighlight2",
+  "showHighlight3",
+  "showProgramsSection",
+  "showProgram1",
+  "showProgram2",
+  "showProgram3",
+  "showArticlesSection",
+  "showCtaSection",
+] as const;
+
+export type HomeVisibilityField = (typeof HOME_VISIBILITY_FIELDS)[number];
+
 // The video/tile *URLs* are separate from HOME_CONTENT_FIELDS/the form's
 // required-text schema below: each is optional (null = show a placeholder),
 // unlike every other field (including the tile labels) which is always a
 // non-empty string.
-export type HomeContent = Record<HomeContentField, string> & {
-  heroVideoUrl: string | null;
-  heroVideoEmbedUrl: string | null;
-  heroTile1Url: string | null;
-  heroTile2Url: string | null;
-  heroTile3Url: string | null;
-  heroTile4Url: string | null;
-};
+export type HomeContent = Record<HomeContentField, string> &
+  Record<HomeVisibilityField, boolean> & {
+    heroVideoUrl: string | null;
+    heroVideoEmbedUrl: string | null;
+    heroTile1Url: string | null;
+    heroTile2Url: string | null;
+    heroTile3Url: string | null;
+    heroTile4Url: string | null;
+  };
 
 // Mirrors the @default() values in prisma/schema.prisma — used as a safety net
 // if the singleton row hasn't been created yet (e.g. migration ran without seeding).
@@ -130,6 +156,22 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
   heroTile2Url: null,
   heroTile3Url: null,
   heroTile4Url: null,
+  showHeroChip1: true,
+  showHeroChip2: true,
+  showHeroChip3: true,
+  showUspSection: true,
+  showUsp1: true,
+  showUsp2: true,
+  showHighlightsSection: true,
+  showHighlight1: true,
+  showHighlight2: true,
+  showHighlight3: true,
+  showProgramsSection: true,
+  showProgram1: true,
+  showProgram2: true,
+  showProgram3: true,
+  showArticlesSection: true,
+  showCtaSection: true,
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -145,6 +187,9 @@ export async function getHomeContent(): Promise<HomeContent> {
     heroTile4Url: row.heroTile4Url,
   } as HomeContent;
   for (const field of HOME_CONTENT_FIELDS) {
+    content[field] = row[field];
+  }
+  for (const field of HOME_VISIBILITY_FIELDS) {
     content[field] = row[field];
   }
   return content;

@@ -28,21 +28,27 @@ export default async function Home() {
   });
 
   const usps = [
-    { tag: c.usp1Tag, title: c.usp1Title, name: c.usp1Name, desc: c.usp1Desc },
-    { tag: c.usp2Tag, title: c.usp2Title, name: c.usp2Name, desc: c.usp2Desc },
-  ];
+    { tag: c.usp1Tag, title: c.usp1Title, name: c.usp1Name, desc: c.usp1Desc, show: c.showUsp1 },
+    { tag: c.usp2Tag, title: c.usp2Title, name: c.usp2Name, desc: c.usp2Desc, show: c.showUsp2 },
+  ].filter((u) => u.show);
 
   const highlights = [
-    { title: c.highlight1Title, desc: c.highlight1Desc },
-    { title: c.highlight2Title, desc: c.highlight2Desc },
-    { title: c.highlight3Title, desc: c.highlight3Desc },
-  ];
+    { title: c.highlight1Title, desc: c.highlight1Desc, show: c.showHighlight1 },
+    { title: c.highlight2Title, desc: c.highlight2Desc, show: c.showHighlight2 },
+    { title: c.highlight3Title, desc: c.highlight3Desc, show: c.showHighlight3 },
+  ].filter((h) => h.show);
 
   const programs = [
-    { age: c.program1Age, name: c.program1Name, desc: c.program1Desc },
-    { age: c.program2Age, name: c.program2Name, desc: c.program2Desc },
-    { age: c.program3Age, name: c.program3Name, desc: c.program3Desc },
-  ];
+    { age: c.program1Age, name: c.program1Name, desc: c.program1Desc, show: c.showProgram1 },
+    { age: c.program2Age, name: c.program2Name, desc: c.program2Desc, show: c.showProgram2 },
+    { age: c.program3Age, name: c.program3Name, desc: c.program3Desc, show: c.showProgram3 },
+  ].filter((p) => p.show);
+
+  const heroChips = [
+    { title: c.heroChip1Title, desc: c.heroChip1Desc, show: c.showHeroChip1 },
+    { title: c.heroChip2Title, desc: c.heroChip2Desc, show: c.showHeroChip2 },
+    { title: c.heroChip3Title, desc: c.heroChip3Desc, show: c.showHeroChip3 },
+  ].filter((chip) => chip.show);
 
   const heroTiles = [
     { url: c.heroTile1Url, label: c.heroTile1Label },
@@ -124,69 +130,70 @@ export default async function Home() {
                   ))}
                 </div>
               </div>
-            ) : (
+            ) : heroChips.length > 0 ? (
               <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-3 sm:max-w-md lg:mx-0">
-                <div className="col-span-2 rounded-2xl bg-white/10 p-5 backdrop-blur">
-                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip1Title}</p>
-                  <p className="mt-1 text-sm text-white/70">{c.heroChip1Desc}</p>
-                </div>
-                <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip2Title}</p>
-                  <p className="mt-1 text-sm text-white/70">{c.heroChip2Desc}</p>
-                </div>
-                <div className="rounded-2xl bg-white/10 p-5 backdrop-blur">
-                  <p className="font-heading text-lg font-semibold text-gold-300">{c.heroChip3Title}</p>
-                  <p className="mt-1 text-sm text-white/70">{c.heroChip3Desc}</p>
-                </div>
+                {heroChips.map((chip, i) => (
+                  <div
+                    key={chip.title}
+                    className={`rounded-2xl bg-white/10 p-5 backdrop-blur ${i === 0 ? "col-span-2" : ""}`}
+                  >
+                    <p className="font-heading text-lg font-semibold text-gold-300">{chip.title}</p>
+                    <p className="mt-1 text-sm text-white/70">{chip.desc}</p>
+                  </div>
+                ))}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </section>
 
       {/* USP twin pillars */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="text-center">
-          <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">{c.uspSectionTitle}</h2>
-          <p className="mt-2 text-neutral-600">{c.uspSectionSubtitle}</p>
-        </div>
+      {c.showUspSection && usps.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="text-center">
+            <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">{c.uspSectionTitle}</h2>
+            <p className="mt-2 text-neutral-600">{c.uspSectionSubtitle}</p>
+          </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {usps.map((u) => (
-            <div
-              key={u.title}
-              className="rounded-2xl border border-pitch-100 bg-white p-6 shadow-sm transition hover:shadow-md sm:p-8"
-            >
-              <span className="inline-block rounded-full bg-pitch-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-pitch-700">
-                {u.tag}
-              </span>
-              <h3 className="mt-4 font-heading text-xl font-bold text-pitch-900">{u.title}</h3>
-              <p className="mt-1 text-sm font-medium text-gold-600">{u.name}</p>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-600">{u.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Highlights */}
-      <section className="bg-pitch-50">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <h2 className="text-center font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
-            {c.highlightsSectionTitle}
-          </h2>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {highlights.map((h) => (
-              <div key={h.title} className="rounded-xl bg-white p-6 shadow-sm">
-                <h3 className="font-heading text-lg font-semibold text-pitch-800">{h.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{h.desc}</p>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {usps.map((u) => (
+              <div
+                key={u.title}
+                className="rounded-2xl border border-pitch-100 bg-white p-6 shadow-sm transition hover:shadow-md sm:p-8"
+              >
+                <span className="inline-block rounded-full bg-pitch-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-pitch-700">
+                  {u.tag}
+                </span>
+                <h3 className="mt-4 font-heading text-xl font-bold text-pitch-900">{u.title}</h3>
+                <p className="mt-1 text-sm font-medium text-gold-600">{u.name}</p>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-600">{u.desc}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Highlights */}
+      {c.showHighlightsSection && highlights.length > 0 && (
+        <section className="bg-pitch-50">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+            <h2 className="text-center font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
+              {c.highlightsSectionTitle}
+            </h2>
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {highlights.map((h) => (
+                <div key={h.title} className="rounded-xl bg-white p-6 shadow-sm">
+                  <h3 className="font-heading text-lg font-semibold text-pitch-800">{h.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">{h.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Latest articles */}
-      {latestArticles.length > 0 && (
+      {c.showArticlesSection && latestArticles.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="text-center">
             <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">บทความล่าสุด</h2>
@@ -229,42 +236,46 @@ export default async function Home() {
       )}
 
       {/* Programs teaser */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div>
-            <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
-              {c.programsSectionTitle}
-            </h2>
-            <p className="mt-2 text-neutral-600">{c.programsSectionSubtitle}</p>
-          </div>
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {programs.map((p) => (
-            <div
-              key={p.name}
-              className="rounded-2xl border border-neutral-200 p-6 transition hover:border-gold-400 hover:shadow-md"
-            >
-              <span className="text-sm font-semibold text-gold-600">{p.age}</span>
-              <h3 className="mt-1 font-heading text-lg font-bold text-pitch-900">{p.name}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.desc}</p>
+      {c.showProgramsSection && programs.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div>
+              <h2 className="font-heading text-2xl font-bold text-pitch-900 sm:text-3xl">
+                {c.programsSectionTitle}
+              </h2>
+              <p className="mt-2 text-neutral-600">{c.programsSectionSubtitle}</p>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {programs.map((p) => (
+              <div
+                key={p.name}
+                className="rounded-2xl border border-neutral-200 p-6 transition hover:border-gold-400 hover:shadow-md"
+              >
+                <span className="text-sm font-semibold text-gold-600">{p.age}</span>
+                <h3 className="mt-1 font-heading text-lg font-bold text-pitch-900">{p.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
-      <section className="bg-pitch-900">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 sm:py-20">
-          <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">{c.ctaTitle}</h2>
-          <p className="max-w-xl text-white/80">{c.ctaDescription}</p>
-          <Link
-            href="/register"
-            className="flex min-h-[44px] items-center justify-center rounded-full bg-gold-500 px-8 py-3 text-base font-semibold text-pitch-950 shadow-lg transition hover:bg-gold-400"
-          >
-            {c.ctaButtonLabel}
-          </Link>
-        </div>
-      </section>
+      {c.showCtaSection && (
+        <section className="bg-pitch-900">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 sm:py-20">
+            <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">{c.ctaTitle}</h2>
+            <p className="max-w-xl text-white/80">{c.ctaDescription}</p>
+            <Link
+              href="/register"
+              className="flex min-h-[44px] items-center justify-center rounded-full bg-gold-500 px-8 py-3 text-base font-semibold text-pitch-950 shadow-lg transition hover:bg-gold-400"
+            >
+              {c.ctaButtonLabel}
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
