@@ -99,7 +99,17 @@ export const DEFAULT_ABOUT_CONTENT: AboutContent = {
 };
 
 export async function getAboutContent(): Promise<AboutContent> {
-  const row = await prisma.aboutPageContent.findUnique({ where: { id: ABOUT_CONTENT_ID } });
+  // src/app/about/page.tsx is force-dynamic, so this never runs at build
+  // time — but a transient runtime DB outage would otherwise crash the whole
+  // about page. Fall back to defaults instead, same pattern as
+  // getSiteSettings() in src/lib/site-settings.ts.
+  let row;
+  try {
+    row = await prisma.aboutPageContent.findUnique({ where: { id: ABOUT_CONTENT_ID } });
+  } catch (err) {
+    console.warn("getAboutContent: DB query failed, falling back to defaults.", err);
+    return DEFAULT_ABOUT_CONTENT;
+  }
   if (!row) return DEFAULT_ABOUT_CONTENT;
 
   const content = {

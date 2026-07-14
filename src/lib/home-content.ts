@@ -189,7 +189,17 @@ export const DEFAULT_HOME_CONTENT: HomeContent = {
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
-  const row = await prisma.homePageContent.findUnique({ where: { id: HOMEPAGE_CONTENT_ID } });
+  // src/app/page.tsx is force-dynamic (rendered per-request), so this never
+  // runs at build time — but a transient runtime DB outage would otherwise
+  // crash the whole home page. Fall back to defaults instead, same pattern
+  // as getSiteSettings() in src/lib/site-settings.ts.
+  let row;
+  try {
+    row = await prisma.homePageContent.findUnique({ where: { id: HOMEPAGE_CONTENT_ID } });
+  } catch (err) {
+    console.warn("getHomeContent: DB query failed, falling back to defaults.", err);
+    return DEFAULT_HOME_CONTENT;
+  }
   if (!row) return DEFAULT_HOME_CONTENT;
 
   const content = {
