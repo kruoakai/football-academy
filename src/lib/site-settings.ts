@@ -74,7 +74,18 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 };
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const row = await prisma.siteSettings.findUnique({ where: { id: SITE_SETTINGS_ID } });
+  // Called from the root layout, which every route (including static/ISR
+  // pages like /_not-found) goes through — if this throws, the whole build
+  // fails. Most likely causes: no DB connection during `npm run build` in a
+  // Docker build stage (no runtime DB available yet), or a genuine runtime
+  // outage. Either way, fall back to defaults rather than taking the app down.
+  let row;
+  try {
+    row = await prisma.siteSettings.findUnique({ where: { id: SITE_SETTINGS_ID } });
+  } catch (err) {
+    console.warn("getSiteSettings: DB query failed, falling back to defaults.", err);
+    return DEFAULT_SITE_SETTINGS;
+  }
   if (!row) return DEFAULT_SITE_SETTINGS;
 
   const settings = {

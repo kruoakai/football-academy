@@ -3,11 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const articles = await prisma.article.findMany({
-    where: { published: true },
-    select: { slug: true, updatedAt: true },
-    orderBy: { publishedAt: "desc" },
-  });
+  // This route is prerendered at build time — if there's no DB connection yet
+  // (e.g. a Docker build stage) or a genuine runtime outage, fall back to the
+  // static routes only rather than failing the whole build/request.
+  let articles: { slug: string; updatedAt: Date }[] = [];
+  try {
+    articles = await prisma.article.findMany({
+      where: { published: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { publishedAt: "desc" },
+    });
+  } catch (err) {
+    console.warn("sitemap: DB query failed, omitting article routes.", err);
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "yearly", priority: 1 },
