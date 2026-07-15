@@ -78,7 +78,9 @@ export default function ClinicActivityForm({
       <div>
         <label className={labelClass}>รูปภาพ</label>
         <div className="flex items-center gap-4">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
+          {/* aspect-[4/3] matches the live tile on /clinic (src/app/clinic/page.tsx)
+              so the crop the admin sees here is the crop that actually ships. */}
+          <div className="flex aspect-[4/3] w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
               <img src={preview} alt="ตัวอย่างรูปภาพ" className="h-full w-full object-cover" />

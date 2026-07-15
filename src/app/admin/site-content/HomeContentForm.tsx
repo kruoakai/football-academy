@@ -150,7 +150,9 @@ function HeroTileField({
   return (
     <div className="rounded-xl border border-neutral-200 p-4">
       <p className="mb-2 text-sm font-semibold text-pitch-800">ภาพกิจกรรม {index}</p>
-      <div className="flex h-28 w-full items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-pitch-50">
+      {/* aspect-[4/3] matches the live tile on the home page (src/app/page.tsx)
+          so the crop the admin sees here is the crop that actually ships. */}
+      <div className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-pitch-50">
         {preview && !remove ? (
           // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
           <img src={preview} alt="" className="h-full w-full object-cover" />

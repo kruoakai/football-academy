@@ -96,7 +96,10 @@ export default function ArticleForm({
           รูปปก <span className="text-red-600">(บังคับก่อนเผยแพร่)</span>
         </label>
         <div className="flex items-center gap-4">
-          <div className="flex h-20 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
+          {/* aspect-video (16:9) matches every live placement of coverImage
+              (article cards, article header, home page) so the crop the
+              admin sees here is the crop that actually ships. */}
+          <div className="flex aspect-video w-40 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-pitch-50">
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element -- live client-side preview (blob/existing URL), next/image can't optimize those
               <img src={preview} alt="ตัวอย่างรูปปก" className="h-full w-full object-cover" />
