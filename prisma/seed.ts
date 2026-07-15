@@ -14,34 +14,35 @@ async function hash(password: string) {
 }
 
 // public/images/uploads/ is gitignored (runtime-generated, not committed source —
-// same as every other admin-uploaded image in this app), so placeholder article
-// cover images must be generated here at seed-time rather than checked into git,
-// or a fresh clone/deploy would seed rows pointing at files that don't exist.
+// same as every other admin-uploaded image in this app), so placeholder cover
+// images must be generated here at seed-time rather than checked into git, or
+// a fresh clone/deploy would seed rows pointing at files that don't exist.
 async function ensureSeedCoverImage(
   filename: string,
-  gradient: { from: string; to: string; accent: string }
+  gradient: { from: string; to: string; accent: string },
+  { subfolder = "articles", width = 1200, height = 630 }: { subfolder?: string; width?: number; height?: number } = {}
 ): Promise<string> {
-  const dir = path.join(process.cwd(), "public", "images", "uploads", "articles");
+  const dir = path.join(process.cwd(), "public", "images", "uploads", subfolder);
   await mkdir(dir, { recursive: true });
   const filePath = path.join(dir, filename);
   if (!existsSync(filePath)) {
     const svg = `
-      <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="${gradient.from}" />
             <stop offset="100%" stop-color="${gradient.to}" />
           </linearGradient>
         </defs>
-        <rect width="1200" height="630" fill="url(#g)" />
-        <circle cx="1020" cy="140" r="220" fill="${gradient.accent}" opacity="0.12" />
-        <circle cx="120" cy="560" r="160" fill="${gradient.accent}" opacity="0.10" />
-        <rect x="0" y="0" width="14" height="630" fill="${gradient.accent}" />
+        <rect width="${width}" height="${height}" fill="url(#g)" />
+        <circle cx="${width * 0.85}" cy="${height * 0.22}" r="${height * 0.35}" fill="${gradient.accent}" opacity="0.12" />
+        <circle cx="${width * 0.1}" cy="${height * 0.9}" r="${height * 0.25}" fill="${gradient.accent}" opacity="0.10" />
+        <rect x="0" y="0" width="14" height="${height}" fill="${gradient.accent}" />
       </svg>
     `;
     await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toFile(filePath);
   }
-  return `/images/uploads/articles/${filename}`;
+  return `/images/uploads/${subfolder}/${filename}`;
 }
 
 async function main() {
@@ -431,11 +432,44 @@ async function main() {
     });
   }
 
-  await prisma.homePageContent.upsert({
-    where: { id: "homepage" },
-    update: {},
-    create: { id: "homepage" },
-  });
+  // Hero tile URLs have no schema @default() (they're nullable so an admin
+  // can clear them), so a bare upsert leaves them NULL — hasHeroMedia() in
+  // src/app/page.tsx then reports false and the whole video+tile section
+  // falls back to the old 3-chip layout instead of showing placeholder
+  // tiles. Seed real working images: 2 generated gradient placeholders
+  // (no matching real photo exists yet) + 2 reused real committed photos
+  // where the subject genuinely matches the tile's label.
+  const heroTile1Url = await ensureSeedCoverImage(
+    "hero-tile-1-training.jpg",
+    { from: "#0d3d2a", to: "#145c3f", accent: "#e8ac2e" },
+    { subfolder: "home", width: 800, height: 600 }
+  );
+  const heroTile2Url = await ensureSeedCoverImage(
+    "hero-tile-2-match.jpg",
+    { from: "#123a52", to: "#1c5a80", accent: "#e8ac2e" },
+    { subfolder: "home", width: 800, height: 600 }
+  );
+  const heroTile3Url = "/images/clinic-training.jpg";
+  const heroTile4Url = "/images/panuwat-founder.jpg";
+
+  const existingHomeContent = await prisma.homePageContent.findUnique({ where: { id: "homepage" } });
+  if (!existingHomeContent) {
+    await prisma.homePageContent.create({
+      data: { id: "homepage", heroTile1Url, heroTile2Url, heroTile3Url, heroTile4Url },
+    });
+  } else {
+    // Only backfill tiles the admin hasn't touched (still NULL) — never
+    // overwrite a real uploaded photo or an intentional removal.
+    await prisma.homePageContent.update({
+      where: { id: "homepage" },
+      data: {
+        ...(existingHomeContent.heroTile1Url ? {} : { heroTile1Url }),
+        ...(existingHomeContent.heroTile2Url ? {} : { heroTile2Url }),
+        ...(existingHomeContent.heroTile3Url ? {} : { heroTile3Url }),
+        ...(existingHomeContent.heroTile4Url ? {} : { heroTile4Url }),
+      },
+    });
+  }
 
   await prisma.siteSettings.upsert({
     where: { id: "site" },
