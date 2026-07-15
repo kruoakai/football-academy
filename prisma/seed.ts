@@ -1,8 +1,4 @@
 import bcrypt from "bcryptjs";
-import sharp from "sharp";
-import { existsSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
-import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -13,37 +9,15 @@ async function hash(password: string) {
   return bcrypt.hash(password, 10);
 }
 
-// public/images/uploads/ is gitignored (runtime-generated, not committed source —
-// same as every other admin-uploaded image in this app), so placeholder cover
-// images must be generated here at seed-time rather than checked into git, or
-// a fresh clone/deploy would seed rows pointing at files that don't exist.
-async function ensureSeedCoverImage(
-  filename: string,
-  gradient: { from: string; to: string; accent: string },
-  { subfolder = "articles", width = 1200, height = 630 }: { subfolder?: string; width?: number; height?: number } = {}
-): Promise<string> {
-  const dir = path.join(process.cwd(), "public", "images", "uploads", subfolder);
-  await mkdir(dir, { recursive: true });
-  const filePath = path.join(dir, filename);
-  if (!existsSync(filePath)) {
-    const svg = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="${gradient.from}" />
-            <stop offset="100%" stop-color="${gradient.to}" />
-          </linearGradient>
-        </defs>
-        <rect width="${width}" height="${height}" fill="url(#g)" />
-        <circle cx="${width * 0.85}" cy="${height * 0.22}" r="${height * 0.35}" fill="${gradient.accent}" opacity="0.12" />
-        <circle cx="${width * 0.1}" cy="${height * 0.9}" r="${height * 0.25}" fill="${gradient.accent}" opacity="0.10" />
-        <rect x="0" y="0" width="14" height="${height}" fill="${gradient.accent}" />
-      </svg>
-    `;
-    await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toFile(filePath);
-  }
-  return `/images/uploads/${subfolder}/${filename}`;
-}
+// Filenames a previous version of this seed generated into the gitignored
+// public/images/uploads/ folder — real only on whichever machine happened to
+// run seed first, so any environment that seeded from a DB dump or a fresh
+// container without that folder ends up with rows pointing at files that
+// don't exist. Used below to detect and repair rows still carrying one of
+// these, without touching a real photo an admin has since uploaded.
+const LEGACY_GENERATED_ARTICLE_COVER = (slug: string) => `/images/uploads/articles/seed-${slug}.jpg`;
+const LEGACY_GENERATED_HERO_TILE_1 = "/images/uploads/home/hero-tile-1-training.jpg";
+const LEGACY_GENERATED_HERO_TILE_2 = "/images/uploads/home/hero-tile-2-match.jpg";
 
 async function main() {
   console.log("Seeding dev data (test credentials — do not use in production)...");
@@ -316,8 +290,6 @@ async function main() {
       slug: "pre-match-nutrition",
       title: "5 อาหารที่นักฟุตบอลเยาวชนควรกินก่อนแข่ง",
       excerpt: "เลือกอาหารให้ถูกก่อนลงสนาม ช่วยให้ลูกมีพลังงานเต็มที่ตลอดเกม",
-      cover: "seed-pre-match-nutrition.jpg",
-      gradient: { from: "#0d5f3a", to: "#093c27", accent: "#d4a017" },
       content: `## กินอย่างไรให้พร้อมก่อนลงสนาม
 
 การเตรียมร่างกายด้วยอาหารที่เหมาะสมก่อนแข่งขันมีผลต่อพลังงานและสมาธิของนักเรียนตลอดเกม ต่อไปนี้คือ 5 กลุ่มอาหารที่แนะนำ
@@ -334,8 +306,6 @@ async function main() {
       slug: "choosing-football-boots",
       title: "วิธีเลือกรองเท้าฟุตบอลให้เหมาะกับเด็ก",
       excerpt: "รองเท้าที่ใช่ช่วยลดการบาดเจ็บและเพิ่มความมั่นใจให้นักเตะตัวน้อย",
-      cover: "seed-choosing-football-boots.jpg",
-      gradient: { from: "#14532d", to: "#052e16", accent: "#e8ac2e" },
       content: `## เลือกรองเท้าให้เหมาะกับพื้นสนามและวัย
 
 รองเท้าฟุตบอลที่เหมาะสมช่วยลดความเสี่ยงบาดเจ็บและทำให้เล่นได้เต็มประสิทธิภาพ
@@ -351,8 +321,6 @@ async function main() {
       slug: "injury-prevention-basics",
       title: "ป้องกันการบาดเจ็บที่พบบ่อยในนักฟุตบอลเยาวชน",
       excerpt: "อาการบาดเจ็บส่วนใหญ่ป้องกันได้ ด้วยการวอร์มอัพและเทคนิคที่ถูกต้อง",
-      cover: "seed-injury-prevention-basics.jpg",
-      gradient: { from: "#166534", to: "#0d3320", accent: "#f0c040" },
       content: `## รู้ทันการบาดเจ็บ ป้องกันได้ก่อนเกิด
 
 การบาดเจ็บที่พบบ่อยในนักฟุตบอลเยาวชน ได้แก่ ข้อเท้าพลิก กล้ามเนื้อต้นขาอักเสบ และหัวเข่าบาดเจ็บ ซึ่งส่วนใหญ่ป้องกันได้
@@ -374,8 +342,6 @@ async function main() {
       slug: "football-builds-confidence",
       title: "สร้างวินัยและความมั่นใจให้ลูกผ่านฟุตบอล",
       excerpt: "ฟุตบอลไม่ได้สอนแค่ทักษะการเล่น แต่ยังปลูกฝังวินัยและความมั่นใจในตัวเอง",
-      cover: "seed-football-builds-confidence.jpg",
-      gradient: { from: "#0f5132", to: "#062818", accent: "#d4a017" },
       content: `## มากกว่าทักษะลูกหนัง คือบทเรียนชีวิต
 
 การฝึกฟุตบอลอย่างต่อเนื่องช่วยปลูกฝังคุณสมบัติสำคัญให้เด็กนอกเหนือจากทักษะการเล่น
@@ -391,8 +357,6 @@ async function main() {
       slug: "tryout-preparation-guide",
       title: "เตรียมตัวอย่างไรก่อนวันทดสอบเข้าทีม",
       excerpt: "เคล็ดลับเตรียมตัวทั้งร่างกายและจิตใจก่อนวันทดสอบฝีเท้าที่สำคัญ",
-      cover: "seed-tryout-preparation-guide.jpg",
-      gradient: { from: "#0d5f3a", to: "#04140d", accent: "#e8ac2e" },
       content: `## พร้อมทั้งกายและใจก่อนวันสำคัญ
 
 วันทดสอบฝีเท้าเป็นโอกาสสำคัญที่ต้องเตรียมตัวล่วงหน้า ทั้งด้านร่างกายและจิตใจ
@@ -411,60 +375,62 @@ async function main() {
     },
   ];
 
-  for (let i = 0; i < articleSeeds.length; i++) {
-    const seed = articleSeeds[i];
-    const coverImage = await ensureSeedCoverImage(seed.cover, seed.gradient);
-    const publishedAt = new Date(now.getTime() - (articleSeeds.length - i) * 3 * 24 * 60 * 60 * 1000);
-
-    await prisma.article.upsert({
-      where: { slug: seed.slug },
-      update: {},
-      create: {
-        slug: seed.slug,
-        title: seed.title,
-        excerpt: seed.excerpt,
-        content: seed.content,
-        coverImage,
-        authorId: admin.id,
-        published: true,
-        publishedAt,
-      },
-    });
+  // No committed real photo matches any of these topics, and the app's own
+  // publish rule (see src/app/admin/articles/actions.ts) already refuses to
+  // publish an article with no cover image — so these seed as unpublished
+  // drafts with no cover, exactly what an admin would get if they wrote the
+  // content and hadn't uploaded a photo yet. Real content flows through
+  // /admin/articles from here.
+  for (const seed of articleSeeds) {
+    const existing = await prisma.article.findUnique({ where: { slug: seed.slug } });
+    if (!existing) {
+      await prisma.article.create({
+        data: {
+          slug: seed.slug,
+          title: seed.title,
+          excerpt: seed.excerpt,
+          content: seed.content,
+          coverImage: null,
+          authorId: admin.id,
+          published: false,
+          publishedAt: null,
+        },
+      });
+    } else if (existing.coverImage === LEGACY_GENERATED_ARTICLE_COVER(seed.slug)) {
+      // Repair a row created by a previous version of this seed that pointed
+      // at a generated file — never touches a row an admin has since edited.
+      await prisma.article.update({
+        where: { slug: seed.slug },
+        data: { coverImage: null, published: false, publishedAt: null },
+      });
+    }
   }
 
   // Hero tile URLs have no schema @default() (they're nullable so an admin
-  // can clear them), so a bare upsert leaves them NULL — hasHeroMedia() in
+  // can clear them), so a bare create leaves them NULL — hasHeroMedia() in
   // src/app/page.tsx then reports false and the whole video+tile section
-  // falls back to the old 3-chip layout instead of showing placeholder
-  // tiles. Seed real working images: 2 generated gradient placeholders
-  // (no matching real photo exists yet) + 2 reused real committed photos
-  // where the subject genuinely matches the tile's label.
-  const heroTile1Url = await ensureSeedCoverImage(
-    "hero-tile-1-training.jpg",
-    { from: "#0d3d2a", to: "#145c3f", accent: "#e8ac2e" },
-    { subfolder: "home", width: 800, height: 600 }
-  );
-  const heroTile2Url = await ensureSeedCoverImage(
-    "hero-tile-2-match.jpg",
-    { from: "#123a52", to: "#1c5a80", accent: "#e8ac2e" },
-    { subfolder: "home", width: 800, height: 600 }
-  );
+  // falls back to the old 3-chip layout. No committed real photo matches
+  // "เด็กเล็กฝึกทักษะ"/"แข่งขันรุ่นเยาวชน", so those two stay null (the public
+  // page already shows an honest per-tile placeholder for that case) — only
+  // the two tiles whose label genuinely matches a real committed asset get
+  // seeded with one.
   const heroTile3Url = "/images/clinic-training.jpg";
   const heroTile4Url = "/images/panuwat-founder.jpg";
 
   const existingHomeContent = await prisma.homePageContent.findUnique({ where: { id: "homepage" } });
   if (!existingHomeContent) {
     await prisma.homePageContent.create({
-      data: { id: "homepage", heroTile1Url, heroTile2Url, heroTile3Url, heroTile4Url },
+      data: { id: "homepage", heroTile3Url, heroTile4Url },
     });
   } else {
-    // Only backfill tiles the admin hasn't touched (still NULL) — never
-    // overwrite a real uploaded photo or an intentional removal.
+    // Backfill tile3/4 only if still null, and repair tile1/2 only if they
+    // still carry a filename generated by a previous version of this seed —
+    // never touch a real photo an admin has since uploaded.
     await prisma.homePageContent.update({
       where: { id: "homepage" },
       data: {
-        ...(existingHomeContent.heroTile1Url ? {} : { heroTile1Url }),
-        ...(existingHomeContent.heroTile2Url ? {} : { heroTile2Url }),
+        ...(existingHomeContent.heroTile1Url === LEGACY_GENERATED_HERO_TILE_1 ? { heroTile1Url: null } : {}),
+        ...(existingHomeContent.heroTile2Url === LEGACY_GENERATED_HERO_TILE_2 ? { heroTile2Url: null } : {}),
         ...(existingHomeContent.heroTile3Url ? {} : { heroTile3Url }),
         ...(existingHomeContent.heroTile4Url ? {} : { heroTile4Url }),
       },
