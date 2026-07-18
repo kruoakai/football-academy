@@ -34,10 +34,15 @@ services:
       # directly to the internet, bypassing Nginx/TLS).
       - "127.0.0.1:3000:3000"
     volumes:
-      # Admin-uploaded files (e.g. the site logo) are written to this path at
-      # runtime — without a volume they'd be lost on every redeploy, since the
-      # container filesystem is rebuilt from the image each time.
+      # Existing named volume — keep pointed at its original path so files
+      # uploaded before this fix (URLs already stored in the database) keep
+      # resolving as static files from public/.
       - football_academy_uploads:/app/public/images/uploads
+      # New uploads are written here instead and served dynamically by
+      # src/app/api/uploads/[...path]/route.ts — deliberately outside public/,
+      # since files added to public/ after the server has started 404 until
+      # the process restarts (Next.js builds its static-file list once at boot).
+      - football_academy_uploads_v2:/app/uploads
 
   # One-off job, not a long-running service — run explicitly:
   #   docker compose run --rm migrate
@@ -59,3 +64,4 @@ services:
 volumes:
   football_academy_db_data:
   football_academy_uploads:
+  football_academy_uploads_v2:

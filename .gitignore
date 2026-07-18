@@ -47,6 +47,7 @@ next-env.d.ts
 # runtime-uploaded files (admin logo uploads, etc.) — not source code,
 # persists per-deployment via its own filesystem/volume, not git
 /public/images/uploads/
+/uploads/
 # node_modules/
 .next/
 # .env

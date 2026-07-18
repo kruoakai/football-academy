@@ -11,7 +11,8 @@ export type ImageUploadResult = { url: string } | { error: string };
 
 // Resizes to a max width (never upscales) and re-encodes as JPEG for
 // predictable, web-appropriate file sizes, then saves under
-// public/images/uploads/<subfolder>/. Mirrors the logo-upload action in
+// uploads/<subfolder>/ (outside `public/` — see src/app/api/uploads/[...path]/route.ts
+// for why). Mirrors the logo-upload action in
 // src/app/admin/site-settings/actions.ts but adds the actual resize step.
 export async function saveResizedImage(
   file: File,
@@ -37,10 +38,10 @@ export async function saveResizedImage(
   }
 
   const filename = `${randomUUID()}.jpg`;
-  const uploadDir = path.join(process.cwd(), "public", "images", "uploads", subfolder);
+  const uploadDir = path.join(process.cwd(), "uploads", subfolder);
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, filename), resized);
 
-  const url = subfolder ? `/images/uploads/${subfolder}/${filename}` : `/images/uploads/${filename}`;
+  const url = subfolder ? `/api/uploads/${subfolder}/${filename}` : `/api/uploads/${filename}`;
   return { url };
 }

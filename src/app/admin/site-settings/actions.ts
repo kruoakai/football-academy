@@ -67,11 +67,13 @@ export async function updateSiteSettingsAction(
 
     const ext = logoFile.type.split("/")[1] === "svg+xml" ? "svg" : logoFile.type.split("/")[1];
     const filename = `logo-${randomUUID()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "images", "uploads");
+    // Written outside `public/` and served by src/app/api/uploads/[...path]/route.ts —
+    // see that file for why (public/ static-file list is built once at server startup).
+    const uploadDir = path.join(process.cwd(), "uploads");
     await mkdir(uploadDir, { recursive: true });
     const bytes = Buffer.from(await logoFile.arrayBuffer());
     await writeFile(path.join(uploadDir, filename), bytes);
-    uploadedLogoUrl = `/images/uploads/${filename}`;
+    uploadedLogoUrl = `/api/uploads/${filename}`;
   }
 
   const parsed = siteSettingsSchema.safeParse(Object.fromEntries(formData));

@@ -9,7 +9,8 @@ const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // 50MB — short clips only, no tran
 export type VideoUploadResult = { url: string } | { error: string };
 
 // Saves the file as-is (no transcoding/compression, unlike saveResizedImage)
-// under public/images/uploads/<subfolder>/ — good enough for a short,
+// under uploads/<subfolder>/ (outside `public/` — see
+// src/app/api/uploads/[...path]/route.ts for why) — good enough for a short,
 // pre-compressed training clip, not a general video pipeline.
 export async function saveVideoFile(
   file: File,
@@ -24,10 +25,10 @@ export async function saveVideoFile(
 
   const ext = file.type === "video/webm" ? "webm" : "mp4";
   const filename = `${randomUUID()}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "images", "uploads", subfolder);
+  const uploadDir = path.join(process.cwd(), "uploads", subfolder);
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, filename), Buffer.from(await file.arrayBuffer()));
 
-  const url = subfolder ? `/images/uploads/${subfolder}/${filename}` : `/images/uploads/${filename}`;
+  const url = subfolder ? `/api/uploads/${subfolder}/${filename}` : `/api/uploads/${filename}`;
   return { url };
 }
