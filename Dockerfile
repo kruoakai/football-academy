@@ -40,6 +40,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Pre-create the runtime uploads dir with nextjs ownership before it ever gets
+# a volume mounted over it (docker-compose.prod.yml mounts a named volume here).
+# Without this, Docker initializes a brand-new named volume's mountpoint as
+# root:root, and the app (running as the unprivileged `nextjs` user below)
+# gets EACCES on every upload — confirmed by testing a fresh volume directly.
+RUN mkdir -p /app/uploads && chown nextjs:nodejs /app/uploads
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
